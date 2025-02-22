@@ -42,7 +42,7 @@ const TestInfo = (props) => {
             <Link
               className="bg-[#ffffff] text-xl px-5 py-3 rounded-lg font-semibold text-[#235391] border-3"
             >
-              Attempt Test
+              Instructions
             </Link>
           </div>
         </div>

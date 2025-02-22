@@ -4,6 +4,7 @@ import trendingImg from "/trending_img.png";
 import Button from "./Button";
 
 const Trending = (props) => {
+  
   return (
     <div className="mt-[4%] mb-[4%] w-full flex justify-center items-center">
       <div className="bg-[#dee6f2] rounded-3xl w-[82%] h-[55vh] flex justify-start items-start">
@@ -17,7 +18,7 @@ const Trending = (props) => {
           </p> 
 
           <div className="absolute bottom-[15%]">
-            <Button path={props.path}/>
+            <Button path={props.path} name={props.buttonName}/>
           </div>
           
         </div>

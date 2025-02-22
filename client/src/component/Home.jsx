@@ -2,8 +2,6 @@ import React from "react";
 import SideNav from "./templates/SideNav";
 import TopNav from "./templates/TopNav";
 import Header from "./templates/Header";
-import Trending from "./templates/Trending";
-import TestSeries from "./templates/TestSeries";
 import Search from "./templates/Search";
 
 const Home = () => {
@@ -16,7 +14,7 @@ const Home = () => {
         <TopNav />
         <Search />
         <Header />
-        
+
       </div>
     </>
   );

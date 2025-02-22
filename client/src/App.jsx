@@ -2,6 +2,8 @@ import Home from "./component/Home";
 import { Routes, Route } from "react-router-dom";
 import TestDetails from "./component/TestDetails";
 import Test from "./component/Test";
+import Video from "./component/Videos";
+
 
 
 
@@ -13,6 +15,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/test" element={<Test />}/>
         <Route path="/testinfo" element={<TestDetails/>}/>
+        <Route path="/video" element={<Video/>}/>
 
       </Routes>
     </div>

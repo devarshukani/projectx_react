@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Search = () => {
+const Search = ({searchInput}) => {
     
   const [query, setQuery] = useState("");
   return (
@@ -13,7 +13,7 @@ const Search = () => {
           value={query}
           className="w-[93%] border-none outline-none  p-5 text-xl  text-zinc-600"
           type="text"
-          placeholder="search test"
+          placeholder={searchInput||"search"}
         />
         <i className="text-zinc-400 ml-2 text-3xl ri-search-line"></i>
         {query.length > 0 && (
