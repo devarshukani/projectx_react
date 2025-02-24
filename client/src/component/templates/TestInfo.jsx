@@ -34,6 +34,7 @@ const TestInfo = (props) => {
 
           <div className="absolute bottom-[10%] flex gap-5">
             <Link
+            to="/test/testscreen"
               className="bg-[#235391] text-xl px-5 py-3 rounded-lg font-semibold text-white"
             >
               Attempt Test
