@@ -4,8 +4,8 @@ const Search = ({searchInput}) => {
     
   const [query, setQuery] = useState("");
   return (
-    <div className="mt-5 w-full flex flex-col justify-center items-center gap-10">
-        <div className="w-[82%] h-[10vh] rounded-lg bg-white">
+    <div className=" flex flex-col justify-center w-full mx-auto gap-10">
+        <div className=" h-[10vh] rounded-lg bg-white">
         <input
           onChange={(e) => {
             setQuery(e.target.value);
