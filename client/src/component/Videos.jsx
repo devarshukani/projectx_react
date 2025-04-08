@@ -40,9 +40,12 @@ const Video = () => {
   return (
     <>
       <SideNav />
-      <div className="w-[92%] h-full overflow-auto overflow-x-hidden bg-[#ededed]">
+      <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#ededed]">
         <TopNav />
+        <div className="mx-[9%]">
         <Search searchInput="Search courses, subjects & chapters" />
+        </div>
+        
         <Header title="Videos" />
         <Trending
           title="Learn with structured course"

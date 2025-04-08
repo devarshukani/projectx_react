@@ -1,10 +1,29 @@
-import React from "react";
+// testInfo.jsx
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import trendingImg from "/trending_img.png";
 import timerIcon from "/timer.png";
 import languageIcon from "/lang.png";
+import StartTestPopup from "./startTestPopUp";
 
 const TestInfo = (props) => {
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [instructionsChecked, setInstructionsChecked] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleAttemptTestClick = () => {
+    if (instructionsChecked) {
+      setIsPopupOpen(true);
+      setErrorMessage(""); // Clear error message when conditions are met
+    } else {
+      setErrorMessage("Please check the instructions checkbox first.");
+    }
+  };
+
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
+  };
+
   return (
     <div className="mt-[4%] mb-[4%] w-full flex flex-col justify-center items-center">
       <div className="bg-[#dee6f2] rounded-3xl w-[82%] h-[55vh] flex justify-start items-start">
@@ -33,12 +52,12 @@ const TestInfo = (props) => {
           </p>
 
           <div className="absolute bottom-[10%] flex gap-5">
-            <Link
-            to="/test/testscreen"
-              className="bg-[#235391] text-xl px-5 py-3 rounded-lg font-semibold text-white"
+            <button
+              onClick={handleAttemptTestClick}
+              className="bg-[#235391] text-xl px-5 py-3 rounded-lg font-semibold text-white hover:cursor-pointer"
             >
               Attempt Test
-            </Link>
+            </button>
 
             <Link
               className="bg-[#ffffff] text-xl px-5 py-3 rounded-lg font-semibold text-[#235391] border-3"
@@ -53,6 +72,9 @@ const TestInfo = (props) => {
         </div>
       </div>
       <div className="mt-5 w-[82%] flex flex-col justify-start items-start gap-4">
+        {errorMessage && (
+          <div className="text-red-500 mb-4">{errorMessage}</div>
+        )}
         <h1 className="text-3xl font-semibold text-black">Instructions</h1>
         <ul className="mx-3 text-zinc-600 gap-4 flex flex-col list-disc list-inside">
           <li>
@@ -94,9 +116,18 @@ const TestInfo = (props) => {
         </ul>
 
         <label htmlFor="">
-          <input type="checkbox" name="" id="" />I have read the Instructions
+          <input
+            type="checkbox"
+            name=""
+            id=""
+            checked={instructionsChecked}
+            onChange={(e) => setInstructionsChecked(e.target.checked)}
+          />
+          I have read the Instructions
         </label>
       </div>
+
+      <StartTestPopup isOpen={isPopupOpen} onClose={handlePopupClose} />
     </div>
   );
 };

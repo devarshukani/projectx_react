@@ -15,7 +15,7 @@ const Home = () => {
   return (
     <>
       <SideNav />
-      <div className="w-[92%] h-full overflow-auto overflow-x-hidden bg-[#F7F7F7]">
+      <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#F7F7F7]">
         <TopNav />
         <div className="grid grid-cols-12 w-full gap-x-[18px] px-6">
           <div />

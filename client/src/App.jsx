@@ -5,6 +5,7 @@ import Test from "./component/Test";
 import Video from "./component/Videos";
 import TestScreen from "./component/TestScreen";
 import TestResult from "./component/TestResult";
+import Solutions from "./component/Solutions";
 
 function App() {
   return (
@@ -13,10 +14,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/test" element={<Test />} />
         <Route path="/testinfo" element={<TestDetails />} />
-
         <Route path="/test/testscreen" element={<TestScreen />} />
         <Route path="/test/result" element={<TestResult/>}/>
         <Route path="/video" element={<Video />} />
+        <Route path="/test/solution" element={<Solutions/>}/>
       </Routes>
     </div>
   );

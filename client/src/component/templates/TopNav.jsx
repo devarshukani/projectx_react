@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import notification from "/notification.png"
 import account from "/account.png"
-import { Link } from 'react-router-dom'
 import Dropdown from './Dropdown'
 
 const TopNav = () => {

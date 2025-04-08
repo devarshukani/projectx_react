@@ -12,10 +12,18 @@ const TestSeries = () => {
   return (
     <div className="mt-[4%] mb-[4%] w-full flex justify-center items-center">
       <div className="w-[82%] ">
-        <h1 className="font-semibold text-4xl text-black">Test Series</h1>
-        <p className="mt-2 text-zinc-600">
-          Evaluate your exam preparation with the test Series
-        </p>
+        <div className="flex justify-between">
+          <div>
+            <h1 className="font-semibold text-4xl text-black">Test Series</h1>
+            <p className="mt-2 text-zinc-600">
+              Evaluate your exam preparation with the test Series
+            </p>
+          </div>
+          <h1 className="font-semibold text-2xl text-black">Feb 25 - Mar 8</h1>
+
+        </div>
+
+        
 
         <div className="inline-block border rounded mt-5">
           <Dropdown
@@ -33,11 +41,13 @@ const TestSeries = () => {
           <GrandTest />
         </div>
 
-        <h1 className="font-semibold text-4xl text-black my-5">Mahayudh Series</h1>
+        <h1 className="font-semibold text-4xl text-black my-5">
+          Mahayudh Series
+        </h1>
 
         <div className="py-10 w-full grid grid-cols-2 gap-9">
-          <MahayudhTestSeries/>
-          <MahayudhTestSeries/>
+          <MahayudhTestSeries />
+          <MahayudhTestSeries />
         </div>
       </div>
     </div>

@@ -11,9 +11,13 @@ const Home = () => {
   return (
     <>
       <SideNav />
-      <div className="w-[92%] h-full overflow-auto overflow-x-hidden bg-[#ededed]">
+      <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#ededed]">
         <TopNav />
+        <div className="mx-[9%]">
         <Search />
+        </div>
+       
+        
         <Header title="Tests" />
         <Trending
           title="Get upto 50% discount with our scholarship test"
