@@ -11,6 +11,7 @@ import SubjectPerformance from "./templates/SubjectPerformance";
 import LeaderBoard from "./templates/LeaderBoard";
 import Performances from "./Performances";
 import Evaluate from "./templates/Evaluate";
+import UpcomingTest from "./UpcomingTest";
 
 const TestResult = () => {
   const testData = [
@@ -37,6 +38,7 @@ const TestResult = () => {
             
           </div>
           <Evaluate/>
+          <UpcomingTest/>
         </div>
       </div>
     </>

@@ -6,7 +6,7 @@ import ApexChart from "./ApexChart";
 const ResultQuestionGraph = () => {
   return (
     <div className="w-full mt-10 flex justify-center ">
-      <div className=" w-[92%] h-[626px] bg-gray-200 rounded-2xl">
+      <div className=" w-[82%] h-[626px] bg-gray-200 rounded-2xl">
         <div className="flex items-center p-6 gap-6">
           <div className="w-full h-30 relative rounded-lg outline-2 outline-offset-[-1.80px] outline-neutral-300 overflow-hidden p-4 flex justify-between">
             <div className="p-2 flex flex-col">
