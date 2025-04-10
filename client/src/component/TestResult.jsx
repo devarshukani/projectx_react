@@ -11,7 +11,7 @@ import SubjectPerformance from "./templates/SubjectPerformance";
 import LeaderBoard from "./templates/LeaderBoard";
 import Performances from "./Performances";
 import Evaluate from "./templates/Evaluate";
-import UpcomingTest from "./UpcomingTest";
+import UpcomingTest from "./templates/UpcomingTest";
 
 const TestResult = () => {
   const testData = [

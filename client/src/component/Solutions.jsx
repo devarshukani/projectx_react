@@ -107,9 +107,11 @@ const Solutions = () => {
 
             {/*Right Side:  */}
             <div className="w-[75%] space-y-6">
+              <div className="w-full bg-zinc-300 rounded-2xl"> <div className="w-[25%] h-4 bg-blue-900 rounded-2xl mb-4"></div></div>
+           
               {questionData.map((question, idx) => (
                 <div key={idx} className="w-full bg-slate-200 rounded-2xl p-4">
-                  <div className="w-[25%] h-4 bg-blue-900 rounded-2xl mb-4"></div>
+                 
                   <div className="w-full bg-neutral-50 rounded-xl shadow-[4px_4px_18px_0px_rgba(180,180,180,0.18)] p-6">
                     {/* Question Header */}
                     <div className="flex justify-between mb-4">
