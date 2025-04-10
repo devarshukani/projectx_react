@@ -1,5 +1,4 @@
-import React from 'react'
-import { Link } from "react-router-dom";
+import React from "react";
 
 const SolutionTopic = ({ name, count, onClick, isActive }) => {
   return (
@@ -16,12 +15,9 @@ const SolutionTopic = ({ name, count, onClick, isActive }) => {
           isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         }`}
       ></div>
-
-      <Link>
-        <h1 className={`text-xl ${isActive?"font-semibold":""} hover:font-semibold`}>{name}</h1>
-      </Link>
+      <h1 className={`text-xl ${isActive ? "font-semibold" : ""}`}>{name}</h1>
     </div>
-  )
-}
+  );
+};
 
-export default SolutionTopic
+export default SolutionTopic;
