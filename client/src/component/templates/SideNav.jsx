@@ -26,7 +26,7 @@ const SideNav = () => {
         <Link to="/test">
           <img className="h-[4.5vh]" src={tests} alt="" />
         </Link>
-        <Link>
+        <Link to="/bookmark">
           <img className="h-[4vh]" src={bookmark} alt="" />
         </Link>
         <Link>

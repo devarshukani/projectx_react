@@ -216,7 +216,7 @@ const Solutions = () => {
             </div>
 
             {/* Right Side */}
-            <div className="w-[75%] space-y-6">
+            <div className="w-[65%] space-y-6">
               <div className="w-full bg-zinc-300 rounded-2xl">
                 {" "}
                 <div className="w-[25%] h-4 bg-blue-900 rounded-2xl mb-4"></div>
