@@ -9,25 +9,49 @@ const countryList = [
   { code: "+86", country: "China" },
 ];
 
-const Login = () => {
+const SignUp = () => {
   const navigate = useNavigate();
+  const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(countryList[0]);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!phoneNumber.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(phoneNumber)) {
+      newErrors.phone = "Phone number must be 10 digits";
+    }
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (phoneNumber.length === 10) {
-      console.log(
-        "Phone number submitted:",
-        `${selectedCountry.code}${phoneNumber}`
-      );
-      navigate("/login-otp", {
+    if (validateForm()) {
+      console.log({
+        name,
+        phoneNumber: `${selectedCountry.code}${phoneNumber}`,
+        email,
+      });
+      navigate("/signup-otp", {
         state: { phoneNumber: phoneNumber },
       });
-    } else {
-      setError("Please enter a valid 10-digit phone number");
     }
   };
 
@@ -40,9 +64,23 @@ const Login = () => {
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name Input */}
+            <div className="relative">
+              <input
+                type="text"
+                className="w-full px-3 py-3 h-12 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
+            </div>
+
+            {/* Phone Number Input */}
             <div className="relative">
               <div className="flex items-stretch">
-                {/* Country Code Dropdown */}
                 <div className="relative inline-flex">
                   <button
                     type="button"
@@ -68,37 +106,46 @@ const Login = () => {
                     </div>
                   )}
                 </div>
-                {/* Phone Number Input */}
                 <input
                   type="tel"
                   maxLength="10"
                   className="flex-1 min-w-0 block w-full px-3 py-3 h-12 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter phone number"
                   value={phoneNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, "");
-                    if (value.length <= 10) {
-                      setPhoneNumber(value);
-                      setError("");
-                    }
-                  }}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                 />
               </div>
-              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
+
+            {/* Email Input */}
+            <div className="relative">
+              <input
+                type="email"
+                className="w-full px-3 py-3 h-12 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Submit
+              Create Account
             </button>
           </form>
 
           <div className="text-center mt-4">
-            <span className="text-zinc-500">Coming for the first time? </span>
-            <Link to="/signup" className="text-blue-600 hover:text-blue-700">
-              Signup
+            <span className="text-zinc-500">Already have an account? </span>
+            <Link to="/login" className="text-blue-600 hover:text-blue-700">
+              Login
             </Link>
           </div>
 
@@ -128,4 +175,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;

@@ -9,6 +9,9 @@ import Solutions from "./component/Solutions";
 import Bookmark from "./component/Bookmark";
 import VideoDetails from "./component/VideoDetails";
 import Login from "./component/Login";
+import SignUp from "./component/SignUp";
+import SignUpOtp from "./component/SignUpOtp";
+import LoginOtp from "./component/LoginOtp";
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/login-otp" element={<LoginOtp />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup-otp" element={<SignUpOtp />} />
         <Route path="/test" element={<Test />} />
         <Route path="/testinfo" element={<TestDetails />} />
         <Route path="/test/testscreen" element={<TestScreen />} />
