@@ -8,12 +8,14 @@ import TestResult from "./component/TestResult";
 import Solutions from "./component/Solutions";
 import Bookmark from "./component/Bookmark";
 import VideoDetails from "./component/VideoDetails";
+import Login from "./component/Login";
 
 function App() {
   return (
     <div className="bg-[#f7f7f7] w-screen h-screen flex">
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/test" element={<Test />} />
         <Route path="/testinfo" element={<TestDetails />} />
         <Route path="/test/testscreen" element={<TestScreen />} />
