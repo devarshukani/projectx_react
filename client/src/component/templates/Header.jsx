@@ -7,10 +7,10 @@ const Header = ({ title }) => {
   const location = useLocation();
 
   const handleBackClick = () => {
-    if (location.pathname === '/video/details') {
-      navigate('/video');
+    if (location.pathname === "/video/details") {
+      navigate("/video");
     } else {
-      navigate('/');
+      navigate("/");
     }
   };
 
@@ -25,7 +25,9 @@ const Header = ({ title }) => {
               className="px-5 pt-5 flex justify-start items-center cursor-pointer"
             >
               <img className="h-[5vh]" src={leftArrow} alt="" />
-              <h2>{location.pathname === '/video/details' ? 'Videos' : 'Home'}</h2>
+              <h2>
+                {location.pathname === "/video/details" ? "Videos" : "Home"}
+              </h2>
             </div>
           </div>
         </div>

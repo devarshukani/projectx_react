@@ -17,11 +17,11 @@ function App() {
         <Route path="/test" element={<Test />} />
         <Route path="/testinfo" element={<TestDetails />} />
         <Route path="/test/testscreen" element={<TestScreen />} />
-        <Route path="/test/result" element={<TestResult/>}/>
+        <Route path="/test/result" element={<TestResult />} />
         <Route path="/video" element={<Video />} />
         <Route path="/video/details" element={<VideoDetails />} />
-        <Route path="/test/solution" element={<Solutions/>}/>
-        <Route path="/bookmark" element={<Bookmark/>}/>
+        <Route path="/test/solution" element={<Solutions />} />
+        <Route path="/bookmark" element={<Bookmark />} />
       </Routes>
     </div>
   );
