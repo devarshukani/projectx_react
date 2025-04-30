@@ -27,7 +27,7 @@ const TestResult = () => {
           <TestResultHorizontalCard title="Master UG Medical Test" free="true"/>
           <ResultQuestionGraph/>
           <div className="mt-10 w-full flex flex-col justify-center items-center ">
-            <div className="flex justify-between w-[82%] gap-10">
+            <div className="flex justify-between w-[75%] gap-10">
             <div className="w-[50%]">
               <LeaderBoard/>
             </div>

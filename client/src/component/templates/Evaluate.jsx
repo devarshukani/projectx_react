@@ -29,7 +29,7 @@ const Evaluate = () => {
 
   return (
     <div className="w-full mt-10 flex justify-center ">
-      <div className=" w-[82%] h-72 bg-gray-200 rounded-2xl p-6">
+      <div className=" w-[75%] h-72 bg-gray-200 rounded-2xl p-6">
         <div className="w-full flex justify-between">
           <h1 className="text-zinc-800 text-xl font-semibold ">Anatomy</h1>
           <div className="flex items-center gap-5">

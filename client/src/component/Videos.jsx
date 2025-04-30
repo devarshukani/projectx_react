@@ -42,8 +42,8 @@ const Video = () => {
       <SideNav />
       <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#ededed]">
         <TopNav />
-        <div className="mx-[9%]">
-        <Search searchInput="Search courses, subjects & chapters" />
+        <div className="mx-[12.5%] mb-10">
+        <Search />
         </div>
         
         <Header title="Videos" />
@@ -53,9 +53,9 @@ const Video = () => {
           buttonName="Enroll Now"
         />
 
-        <div className="flex justify-center m-10">
+        <div className="flex justify-center gap-5 m-30">
           {/* Left Side: Topics List (Sticky) */}
-          <div className="w-[25%] p-10 sticky top-0 h-screen overflow-y-auto">
+          <div className="w-[20%] p-10 sticky top-0 h-screen overflow-y-auto">
             <h1 className="text-3xl font-semibold">Topics</h1>
             <div className="py-10 w-full grid grid-cols-1 gap-4">
               <Subject

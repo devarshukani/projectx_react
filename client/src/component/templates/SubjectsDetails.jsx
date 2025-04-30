@@ -1,8 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import SubjectChapter from "./SubjectChapter";
 
 const SubjectsDetails = ({ name }) => {
+  // Sample chapters data - this would come from API in real implementation
+  const chapters = [
+    { name: "Introduction", count: 4 },
+    { name: "Basic Concepts", count: 3 },
+    { name: "Advanced Topics", count: 5 },
+    { name: "Clinical Applications", count: 4 },
+    { name: "Case Studies", count: 6 },
+    { name: "Practice Questions", count: 4 },
+  ];
+
   return (
     <div className="mb-14">
       <div className="flex items-center">
@@ -13,15 +22,14 @@ const SubjectsDetails = ({ name }) => {
       </div>
 
       <div className="mt-10 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
-        <SubjectChapter subName="Mechanics" chapters={4} />
+        {chapters.map((chapter, index) => (
+          <SubjectChapter
+            key={index}
+            subName={chapter.name}
+            chapters={chapter.count}
+            subjectName={name}
+          />
+        ))}
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ const TestInfo = (props) => {
 
   return (
     <div className="mt-[4%] mb-[4%] w-full flex flex-col justify-center items-center">
-      <div className="bg-[#dee6f2] rounded-3xl w-[82%] h-[55vh] flex justify-start items-start">
+      <div className="bg-[#dee6f2] rounded-3xl w-[75%] h-[45vh] flex justify-start items-start">
         <div className="relative w-[60%] p-[3%] h-full flex flex-col ">
           <p className="mt-2 text-lg text-zinc-500 flex items-center w-[80%]">
             Free
@@ -71,7 +71,7 @@ const TestInfo = (props) => {
           <img className="h-[102%]" src={trendingImg} alt="" />
         </div>
       </div>
-      <div className="mt-5 w-[82%] flex flex-col justify-start items-start gap-4">
+      <div className="mt-5 w-[75%] flex flex-col justify-start items-start gap-4">
         {errorMessage && (
           <div className="text-red-500 mb-4">{errorMessage}</div>
         )}

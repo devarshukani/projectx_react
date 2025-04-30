@@ -7,6 +7,7 @@ import TestScreen from "./component/TestScreen";
 import TestResult from "./component/TestResult";
 import Solutions from "./component/Solutions";
 import Bookmark from "./component/Bookmark";
+import VideoDetails from "./component/VideoDetails";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/test/testscreen" element={<TestScreen />} />
         <Route path="/test/result" element={<TestResult/>}/>
         <Route path="/video" element={<Video />} />
+        <Route path="/video/details" element={<VideoDetails />} />
         <Route path="/test/solution" element={<Solutions/>}/>
         <Route path="/bookmark" element={<Bookmark/>}/>
       </Routes>

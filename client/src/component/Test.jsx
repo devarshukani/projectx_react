@@ -13,7 +13,7 @@ const Home = () => {
       <SideNav />
       <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#ededed]">
         <TopNav />
-        <div className="mx-[9%]">
+        <div className="mx-[12.5%] mb-10">
         <Search />
         </div>
        

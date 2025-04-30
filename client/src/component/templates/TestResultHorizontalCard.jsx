@@ -10,7 +10,7 @@ const TestResultHorizontalCard = (props) => {
   const [emailSent, setEmailSent] = useState(false)
   return (
     <div className="w-full mt-10 flex justify-center ">
-      <div className=" w-[82%] flex items-start mt-8 h-72 bg-slate-200 rounded-2xl">
+      <div className=" w-[75%] flex items-start mt-8 h-72 bg-slate-200 rounded-2xl">
         <div className="relative w-[60%] p-[3%] h-full flex flex-col">
 
           <h1 className="w-[90%] text-3xl font-semibold text-black">
