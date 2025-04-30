@@ -1,14 +1,33 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import first_medal from "/first_medal.svg";
 import second_medal from "/second_medal.svg";
 import third_medal from "/third_medal.svg";
 import LeaderBoardList from "./LeaderBoardList";
 
 const LeaderBoard = () => {
+  const [showLeaderBoard, setShowLeaderBoard] = useState(false);
+  const podiumRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showLeaderBoard &&
+        podiumRef.current &&
+        !podiumRef.current.contains(event.target) &&
+        !event.target.closest(".leaderboard-modal")
+      ) {
+        setShowLeaderBoard(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showLeaderBoard]);
+
   return (
-    <div className=" w-full h-[569px] relative bg-gray-200 rounded-2xl overflow-hidden p-7 flex flex-col justify-between">
+    <div className="w-full h-[569px] relative bg-gray-200 rounded-2xl overflow-hidden p-7 flex flex-col justify-between">
       <div>
-        <h1 className="text-zinc-800 text-lg font-semibold ">LeaderBoard</h1>
+        <h1 className="text-zinc-800 text-lg font-semibold">LeaderBoard</h1>
         <h1 className="text-zinc-800 text-2xl font-semibold">
           Master UG Medical Test
         </h1>
@@ -18,7 +37,11 @@ const LeaderBoard = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-0 flex justify-between w-[90%] px-10">
+      <div
+        ref={podiumRef}
+        onClick={() => setShowLeaderBoard(true)}
+        className="absolute bottom-0 flex justify-between w-[90%] px-10 cursor-pointer hover:opacity-90 transition-opacity"
+      >
         <div className="flex flex-col justify-end items-center gap-4">
           <div className="w-20 h-20 bg-gradient-to-b from-zinc-500 to-zinc-400/20 rounded-full flex justify-center items-center">
             <div className="w-16 h-16 bg-gradient-to-b from-zinc-500 via-neutral-400 to-zinc-400 rounded-full flex justify-center items-center">
@@ -71,10 +94,8 @@ const LeaderBoard = () => {
           </div>
         </div>
       </div>
-      {
-        false && <LeaderBoardList/>
-      }
-      
+
+      {showLeaderBoard && <LeaderBoardList />}
     </div>
   );
 };
