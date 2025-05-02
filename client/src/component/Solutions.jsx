@@ -3,6 +3,7 @@ import Header from "./templates/Header";
 import SideNav from "./templates/SideNav";
 import Subject from "./templates/Subject";
 import SolutionTopic from "./templates/SolutionTopic";
+import ClaimPanel from "./templates/ClaimPanel";
 
 const Solutions = () => {
   const [expandedSection, setExpandedSection] = useState(""); // topics, bookmarks, answers
@@ -10,6 +11,8 @@ const Solutions = () => {
   const [activeTopic, setActiveTopic] = useState(null);
   const [activeBookmark, setActiveBookmark] = useState(null);
   const [activeAnswer, setActiveAnswer] = useState(null);
+  const [showClaimPanel, setShowClaimPanel] = useState(false);
+  const [activeQuestionNo, setActiveQuestionNo] = useState(null);
 
   const topic = [
     "Medicine",
@@ -334,7 +337,13 @@ const Solutions = () => {
                         </div>
                       </div>
                       <div className="flex gap-4">
-                        <i className="ri-message-3-line"></i>
+                        <i
+                          className="ri-message-3-line cursor-pointer"
+                          onClick={() => {
+                            setShowClaimPanel(true);
+                            setActiveQuestionNo(question.question_no);
+                          }}
+                        ></i>
                         <i className="ri-bookmark-line"></i>
                       </div>
                     </div>
@@ -345,6 +354,13 @@ const Solutions = () => {
           </div>
         </div>
       </div>
+
+      {showClaimPanel && (
+        <ClaimPanel
+          onClose={() => setShowClaimPanel(false)}
+          questionNo={activeQuestionNo}
+        />
+      )}
     </>
   );
 };

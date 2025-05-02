@@ -1,5 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setPhoneNumber,
+  setOtpSent,
+  setLoading,
+  setError,
+} from "../redux/slices/authSlice";
+import { sendOtp } from "../services/apiService";
 
 const countryList = [
   { code: "+91", country: "India" },
@@ -11,23 +19,30 @@ const countryList = [
 
 const Login = () => {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const dispatch = useDispatch();
+  const [localPhoneNumber, setLocalPhoneNumber] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(countryList[0]);
-  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const { loading, error } = useSelector((state) => state.auth);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (phoneNumber.length === 10) {
-      console.log(
-        "Phone number submitted:",
-        `${selectedCountry.code}${phoneNumber}`
-      );
-      navigate("/login-otp", {
-        state: { phoneNumber: phoneNumber },
-      });
+    if (localPhoneNumber.length === 10) {
+      const fullPhoneNumber = `${selectedCountry.code}${localPhoneNumber}`;
+      dispatch(setLoading(true));
+      try {
+        await sendOtp(fullPhoneNumber, "login");
+        dispatch(setPhoneNumber(localPhoneNumber));
+        dispatch(setOtpSent(true));
+        navigate("/login-otp", {
+          state: { phoneNumber: localPhoneNumber },
+        });
+      } catch (err) {
+        dispatch(setError(err.message || "Failed to send OTP"));
+      }
     } else {
-      setError("Please enter a valid 10-digit phone number");
+      dispatch(setError("Please enter a valid 10-digit phone number"));
     }
   };
 
@@ -74,12 +89,12 @@ const Login = () => {
                   maxLength="10"
                   className="flex-1 min-w-0 block w-full px-3 py-3 h-12 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter phone number"
-                  value={phoneNumber}
+                  value={localPhoneNumber}
                   onChange={(e) => {
                     const value = e.target.value.replace(/[^0-9]/g, "");
                     if (value.length <= 10) {
-                      setPhoneNumber(value);
-                      setError("");
+                      setLocalPhoneNumber(value);
+                      dispatch(setError(""));
                     }
                   }}
                 />

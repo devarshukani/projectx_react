@@ -1,10 +1,14 @@
 import React from "react";
 import leftArrow from "/left_arrow.png";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutSuccess } from "../../redux/slices/authSlice";
 
 const Header = ({ title }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useSelector((state) => state.auth);
 
   const handleBackClick = () => {
     if (location.pathname === "/video/details") {
@@ -12,6 +16,11 @@ const Header = ({ title }) => {
     } else {
       navigate("/");
     }
+  };
+
+  const handleLogout = () => {
+    dispatch(logoutSuccess());
+    navigate("/login");
   };
 
   return (
@@ -28,6 +37,17 @@ const Header = ({ title }) => {
               <h2>
                 {location.pathname === "/video/details" ? "Videos" : "Home"}
               </h2>
+            </div>
+            <div className="flex items-center space-x-4">
+              {user?.name && (
+                <span className="text-gray-700">Welcome, {user.name}</span>
+              )}
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm text-red-600 hover:text-red-800"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>

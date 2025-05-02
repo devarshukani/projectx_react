@@ -9,38 +9,186 @@ import TimeUp from "./templates/TimeUp";
 import { useLocation } from "react-router-dom";
 
 const TestScreen = () => {
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [answeredCount, setAnsweredCount] = useState(0);
   const [markedCount, setMarkedCount] = useState(0);
-  const [unansweredCount, setUnansweredCount] = useState(15);
+  const [unansweredCount, setUnansweredCount] = useState(0);
+  const [skippedCount, setSkippedCount] = useState(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [timeLeft, setTimeLeft] = useState(3600);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [isQuestionAnswered, setIsQuestionAnswered] = useState(false);
   const timerRef = useRef(null);
   const location = useLocation();
-  const allowChangeAnswer = location.state?.allowChangeAnswer;
-  const [skippedCount, setSkippedCount] = useState(0);
-  const [isQuestionMarked, setIsQuestionMarked] = useState(false);
 
-  const handleOptionSelect = (option) => {
-    if (!isQuestionAnswered && !isQuestionMarked) {
+  // Track question status for each question
+  const [questionStatuses, setQuestionStatuses] = useState({});
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await fetch(
+        "http://13.203.220.236/api/questions?page=1&limit=10"
+      );
+      const data = await response.json();
+      if (data.success) {
+        setQuestions(data.data);
+        setUnansweredCount(data.data.length);
+        setLoading(false);
+
+        // Initialize question statuses
+        const initialStatuses = {};
+        data.data.forEach((q) => {
+          initialStatuses[q.id] = {
+            status: "unanswered",
+            selectedOption: null,
+          };
+        });
+        setQuestionStatuses(initialStatuses);
+      }
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleOptionSelect = (optionId) => {
+    console.log("Option selected:", optionId);
+    const currentQuestion = questions[currentQuestionIndex];
+
+    setSelectedOption(optionId);
+
+    // Update status for current question
+    setQuestionStatuses((prev) => {
+      const newStatus = {
+        ...prev,
+        [currentQuestion.id]: {
+          status: "answered",
+          selectedOption: optionId,
+        },
+      };
+      console.log("New question statuses:", newStatus);
+      return newStatus;
+    });
+
+    // Update counts
+    if (questionStatuses[currentQuestion.id].status === "unanswered") {
       setAnsweredCount((prev) => prev + 1);
       setUnansweredCount((prev) => prev - 1);
-      setIsQuestionAnswered(true);
+    } else if (questionStatuses[currentQuestion.id].status === "marked") {
+      setAnsweredCount((prev) => prev + 1);
+      setMarkedCount((prev) => prev - 1);
+    } else if (questionStatuses[currentQuestion.id].status === "skipped") {
+      setAnsweredCount((prev) => prev + 1);
+      setSkippedCount((prev) => prev - 1);
     }
-    setSelectedOption(option);
   };
 
   const handleMark = () => {
-    if (!isQuestionAnswered && !isQuestionMarked) {
-      setMarkedCount((prev) => prev + 1);
+    console.log("Mark button clicked");
+    const currentQuestion = questions[currentQuestionIndex];
+    const currentStatus = questionStatuses[currentQuestion.id];
+
+    // Update the status to marked if it's not already answered
+    if (currentStatus.status !== "answered") {
+      console.log("Marking question for review");
+      setQuestionStatuses((prev) => {
+        const newStatus = {
+          ...prev,
+          [currentQuestion.id]: {
+            selectedOption: currentStatus.selectedOption,
+            status: "marked",
+          },
+        };
+        console.log("New question statuses after marking:", newStatus);
+        return newStatus;
+      });
+
+      // Update counts
+      if (currentStatus.status === "unanswered") {
+        setMarkedCount((prev) => prev + 1);
+        setUnansweredCount((prev) => prev - 1);
+      } else if (currentStatus.status === "skipped") {
+        setMarkedCount((prev) => prev + 1);
+        setSkippedCount((prev) => prev - 1);
+      }
+    }
+  };
+
+  const handleNext = () => {
+    console.log("Save & Next clicked");
+    const currentQuestion = questions[currentQuestionIndex];
+    const currentStatus = questionStatuses[currentQuestion.id];
+
+    // If question is unanswered and not marked, mark it as skipped
+    if (
+      currentStatus.status === "unanswered" &&
+      !currentStatus.selectedOption
+    ) {
+      console.log("Marking as skipped");
+      setQuestionStatuses((prev) => {
+        const newStatus = {
+          ...prev,
+          [currentQuestion.id]: {
+            ...prev[currentQuestion.id],
+            status: "skipped",
+          },
+        };
+        console.log("New question statuses after skipping:", newStatus);
+        return newStatus;
+      });
+      setSkippedCount((prev) => prev + 1);
       setUnansweredCount((prev) => prev - 1);
-      setIsQuestionMarked(true); // Mark the question
+    }
+
+    // Move to next question if available
+    if (currentQuestionIndex < questions.length - 1) {
+      console.log("Moving to next question");
+      setCurrentQuestionIndex((prev) => prev + 1);
+      const nextQuestion = questions[currentQuestionIndex + 1];
+      setSelectedOption(
+        questionStatuses[nextQuestion.id]?.selectedOption || null
+      );
+    }
+  };
+
+  const handlePrevious = () => {
+    console.log("Previous clicked");
+    if (currentQuestionIndex > 0) {
+      console.log("Moving to previous question");
+      setCurrentQuestionIndex((prev) => prev - 1);
+      const prevQuestion = questions[currentQuestionIndex - 1];
+      const prevStatus = questionStatuses[prevQuestion.id];
+      setSelectedOption(prevStatus?.selectedOption || null);
+    }
+  };
+
+  // Get color for question icon based on status
+  const getQuestionColor = (questionId) => {
+    const status = questionStatuses[questionId]?.status;
+    console.log(
+      "Getting color for question",
+      questionId,
+      "with status:",
+      status
+    );
+    switch (status) {
+      case "answered":
+        return "#298548"; // green
+      case "marked":
+        return "#f9b42c"; // yellow
+      case "skipped":
+        return "#db4545"; // red
+      default:
+        return "#cbcdd2"; // grey for unanswered
     }
   };
 
   useEffect(() => {
-    console.log("can change ", allowChangeAnswer);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev > 0) {
@@ -88,55 +236,60 @@ const TestScreen = () => {
               </h1>
             </div>
             <div className="mt-2 bg-[#f9f9f9] rounded-lg p-4 shadow-md flex-grow">
-              <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-semibold">Question 1</h1>
-                <div className="flex gap-3">
-                  <p className="text-green-700">+4 marks</p>
-                  <p className="text-red-500">-1 marks</p>
-                </div>
-              </div>
+              {loading ? (
+                <div>Loading...</div>
+              ) : questions.length > 0 ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-semibold">
+                      Question {currentQuestionIndex + 1}
+                    </h1>
+                    <div className="flex gap-3">
+                      <p className="text-green-700">+4 marks</p>
+                      <p className="text-red-500">-1 marks</p>
+                    </div>
+                  </div>
 
-              <div className="mt-3">
-                <p className="text-black text-lg">
-                  A 41-year-old female presents with band like bilateral tight
-                  headache. Headache last for around 2 hours when it happens.
-                  She is on oral contraceptive pills for 13 years. There is no
-                  associated nausea, vomiting or photophobia seen. Most likely
-                  type of headache she is suffering is:
-                </p>
-              </div>
+                  <div className="mt-3">
+                    <p className="text-black text-lg">
+                      {questions[currentQuestionIndex].question}
+                      {questions[currentQuestionIndex].que_image && (
+                        <img
+                          src={questions[currentQuestionIndex].que_image}
+                          alt="Question"
+                          className="mt-4 max-w-full"
+                        />
+                      )}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div>No questions available</div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-10 mt-10 justify-between flex-grow">
-              <QuestionOption
-                option="Tension headache"
-                name="question1"
-                selected={selectedOption === "Tension headache"}
-                onSelect={() => handleOptionSelect("Tension headache")}
-              />
-              <QuestionOption
-                option="Trigeminal neuralgia"
-                name="question1"
-                selected={selectedOption === "Trigeminal neuralgia"}
-                onSelect={() => handleOptionSelect("Trigeminal neuralgia")}
-              />
-              <QuestionOption
-                option="Migraine"
-                name="question1"
-                selected={selectedOption === "Migraine"}
-                onSelect={() => handleOptionSelect("Migraine")}
-              />
-              <QuestionOption
-                option="Cluster headache"
-                name="question1"
-                selected={selectedOption === "Cluster headache"}
-                onSelect={() => handleOptionSelect("Cluster headache")}
-              />
+              {!loading &&
+                questions.length > 0 &&
+                questions[currentQuestionIndex].options.map((option) => (
+                  <QuestionOption
+                    key={option.id}
+                    option={option.name}
+                    name={`question${questions[currentQuestionIndex].id}`}
+                    selected={selectedOption === option.id}
+                    onSelect={() => handleOptionSelect(option.id)}
+                  />
+                ))}
             </div>
           </div>
 
           <div className="sticky bottom-0 w-full h-[14vh] flex justify-between items-center bg-[#f7f7f7]">
-            <Button name="Previous" color="#dee6f2" textColor="#84888f" />
+            <Button
+              name="Previous"
+              color="#dee6f2"
+              textColor="#84888f"
+              onClick={handlePrevious}
+            />
 
             <div className="flex gap-4">
               <Button
@@ -145,7 +298,7 @@ const TestScreen = () => {
                 textColor="#84888f"
                 onClick={handleMark}
               />
-              <Button name="Save & next" />
+              <Button name="Save & next" onClick={handleNext} />
             </div>
           </div>
         </div>
@@ -203,10 +356,32 @@ const TestScreen = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 mt-10 gap-9 ">
-          {Array.from({ length: 15 }, (_, index) => (
-            <QuestionIcon key={index + 1} value={index + 1} />
-          ))}
+        <div className="grid grid-cols-4 mt-10 gap-9">
+          {!loading &&
+            questions.map((question, index) => {
+              const status = questionStatuses[question.id];
+              let color = "#cbcdd2"; // default unanswered
+              if (status) {
+                if (status.status === "answered") {
+                  color = "#298548";
+                } else if (status.status === "marked") {
+                  color = "#f9b42c";
+                }
+              }
+
+              return (
+                <div
+                  key={index}
+                  onClick={() => setCurrentQuestionIndex(index)}
+                  className="cursor-pointer"
+                >
+                  <QuestionIcon
+                    value={index + 1}
+                    color={getQuestionColor(question.id)}
+                  />
+                </div>
+              );
+            })}
         </div>
       </div>
       {showSubmitModal && (

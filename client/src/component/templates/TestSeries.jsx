@@ -1,11 +1,11 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import Dropdown from "./Dropdown";
-
 import GrandTest from "./GrandTest";
 import MahayudhTestSeries from "./MahayudhTestSeries";
 
-const TestSeries = () => {
+const TestSeries = ({ tests = [] }) => {
+  const [testCategory, setTestCategory] = useState("Ongoing");
+
   return (
     <div className="w-full">
       <div className="w-full flex justify-center">
@@ -18,7 +18,7 @@ const TestSeries = () => {
               </p>
             </div>
             <h1 className="font-semibold text-2xl text-black">
-              Feb 25 - Mar 8
+              {tests.length > 0 && `Feb 23 - Apr 10`}
             </h1>
           </div>
 
@@ -27,15 +27,25 @@ const TestSeries = () => {
               title={"Test Category"}
               options={["Ongoing", "Upcoming", "Scheduled"]}
               func={(e) => {
-                // setTestcategory(e.target.value);
+                setTestCategory(e.target.value);
               }}
             />
           </div>
 
           <div className="py-10 w-full grid grid-cols-2 gap-9">
-            <GrandTest />
-            <GrandTest />
-            <GrandTest />
+            {tests.map((test) => (
+              <GrandTest
+                key={test.id}
+                testData={{
+                  id: test.id,
+                  name: test.name,
+                  date: test.date,
+                  duration: test.duration,
+                  questionsCount: test.questions.length,
+                  image: test.image,
+                }}
+              />
+            ))}
           </div>
 
           <h1 className="font-semibold text-4xl text-black my-5">

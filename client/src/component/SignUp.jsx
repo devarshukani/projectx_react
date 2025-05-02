@@ -1,5 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setPhoneNumber,
+  setOtpSent,
+  setLoading,
+  setError,
+} from "../redux/slices/authSlice";
+import { sendOtp } from "../services/apiService";
 
 const countryList = [
   { code: "+91", country: "India" },
@@ -11,12 +19,15 @@ const countryList = [
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [localPhoneNumber, setLocalPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(countryList[0]);
-  const [errors, setErrors] = useState({});
+
+  const { loading, error } = useSelector((state) => state.auth);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const validateForm = () => {
     const newErrors = {};
@@ -25,9 +36,9 @@ const SignUp = () => {
       newErrors.name = "Name is required";
     }
 
-    if (!phoneNumber.trim()) {
+    if (!localPhoneNumber.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(phoneNumber)) {
+    } else if (!/^\d{10}$/.test(localPhoneNumber)) {
       newErrors.phone = "Phone number must be 10 digits";
     }
 
@@ -37,21 +48,29 @@ const SignUp = () => {
       newErrors.email = "Invalid email format";
     }
 
-    setErrors(newErrors);
+    setValidationErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log({
-        name,
-        phoneNumber: `${selectedCountry.code}${phoneNumber}`,
-        email,
-      });
-      navigate("/signup-otp", {
-        state: { phoneNumber: phoneNumber },
-      });
+      const fullPhoneNumber = `${selectedCountry.code}${localPhoneNumber}`;
+      dispatch(setLoading(true));
+      try {
+        await sendOtp(fullPhoneNumber, "signup");
+        dispatch(setPhoneNumber(localPhoneNumber));
+        dispatch(setOtpSent(true));
+        navigate("/signup-otp", {
+          state: {
+            phoneNumber: localPhoneNumber,
+            name,
+            email,
+          },
+        });
+      } catch (err) {
+        dispatch(setError(err.message || "Failed to send OTP"));
+      }
     }
   };
 
@@ -73,8 +92,10 @@ const SignUp = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              {validationErrors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.name}
+                </p>
               )}
             </div>
 
@@ -111,12 +132,14 @@ const SignUp = () => {
                   maxLength="10"
                   className="flex-1 min-w-0 block w-full px-3 py-3 h-12 border border-l-0 border-gray-300 rounded-r-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter phone number"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  value={localPhoneNumber}
+                  onChange={(e) => setLocalPhoneNumber(e.target.value)}
                 />
               </div>
-              {errors.phone && (
-                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              {validationErrors.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.phone}
+                </p>
               )}
             </div>
 
@@ -129,8 +152,10 @@ const SignUp = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              {validationErrors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.email}
+                </p>
               )}
             </div>
 

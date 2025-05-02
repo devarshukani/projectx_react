@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess, setError, setLoading } from "../redux/slices/authSlice";
+import { verifyOtp } from "../services/apiService";
 
 const LoginOtp = () => {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
-  const phoneNumber = location.state?.phoneNumber || "";
+  const dispatch = useDispatch();
+  const { phoneNumber, loading, error } = useSelector((state) => state.auth);
 
   const getMaskedPhoneNumber = (number) => {
     if (!number) return "";
@@ -13,11 +16,17 @@ const LoginOtp = () => {
     return `XXXXXX${lastFourDigits}`;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (otp.length === 6) {
-      console.log("Login OTP submitted:", otp);
-      // Will integrate API later
+      dispatch(setLoading(true));
+      try {
+        const response = await verifyOtp(phoneNumber, otp, "login");
+        dispatch(loginSuccess(response.user));
+        navigate("/"); // Navigate to home after successful login
+      } catch (err) {
+        dispatch(setError(err.message || "Failed to verify OTP"));
+      }
     }
   };
 
@@ -49,20 +58,20 @@ const LoginOtp = () => {
                   OTP sent to the phone no. {getMaskedPhoneNumber(phoneNumber)}
                 </p>
               )}
+              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
             </div>
 
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              disabled={otp.length !== 6}
+              disabled={otp.length !== 6 || loading}
             >
-              Submit
+              {loading ? "Verifying..." : "Submit"}
             </button>
           </form>
         </div>
       </div>
 
-      {/* Right Side - Image */}
       <div className="hidden md:flex w-1/2 bg-gray-100 items-center justify-center">
         <img src="/login.svg" alt="Login" className="max-w-full h-auto" />
       </div>
