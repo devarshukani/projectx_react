@@ -2,32 +2,27 @@ import SideNav from "./templates/SideNav";
 import TopNav from "./templates/TopNav";
 import Search from "./templates/Search";
 import SubjectCardSlider from "./templates/SubjectCardSlider";
-import HeroImageText from "./templates/HeroImageText";
-import MockCalendar from "./templates/MockCalendar";
+import SubjectSlider from "./templates/SubjectSlider";
 import FixedChatButton from "./templates/FixedChatButton";
 import FeedHome from "./templates/FeedHome";
-
+import Header from "./templates/Header";
 
 const Home = () => {
   console.log("home");
-
 
   return (
     <>
       <SideNav />
       <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#F7F7F7]">
         <TopNav />
-        <div className="grid grid-cols-12 w-full gap-x-[18px] px-6">
-          <div />
-          <div className="col-span-9">
-            <Search />
-            <HeroImageText />
-          </div>
-          <MockCalendar />
+        <div className="mx-[12.5%] mb-10">
+          <Search />
         </div>
-
+        <div className="mb-10">
+          <SubjectSlider />
+        </div>
         {/* Sliding demo lectures cards */}
-        <SubjectCardSlider />
+        {/* <SubjectCardSlider /> */}
 
         {/* Fixed Chat button in bottom right */}
         <FixedChatButton />
