@@ -162,8 +162,9 @@ const TestScreen = () => {
       console.log("Moving to previous question");
       setCurrentQuestionIndex((prev) => prev - 1);
       const prevQuestion = questions[currentQuestionIndex - 1];
-      const prevStatus = questionStatuses[prevQuestion.id];
-      setSelectedOption(prevStatus?.selectedOption || null);
+      setSelectedOption(
+        questionStatuses[prevQuestion.id]?.selectedOption || null
+      );
     }
   };
 

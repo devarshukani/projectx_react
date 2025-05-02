@@ -10,7 +10,7 @@ const TestHome = () => {
       <SideNav />
       <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#ededed]">
         <TopNav />
-        <Header />
+        <Header title="Test Details" />
         <TestInfo title="Master UG Medical Test" free="true" />
       </div>
     </>

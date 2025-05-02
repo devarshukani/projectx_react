@@ -2,12 +2,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const StartTestPopup = ({ isOpen, onClose }) => {
+const StartTestPopup = ({ isOpen, onClose, testData }) => {
   const [allowChangeAnswer, setAllowChangeAnswer] = useState(true);
   const navigate = useNavigate();
 
   const handlePopupSubmit = () => {
-    navigate("/test/testscreen", { state: { allowChangeAnswer } });
+    navigate("/test/testscreen", {
+      state: {
+        allowChangeAnswer,
+        testData,
+      },
+    });
     onClose();
   };
 
@@ -15,8 +20,11 @@ const StartTestPopup = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex justify-center items-center">
-      <div className="fixed bg-[#d2d2d2] opacity-50 inset-0 backdrop-blur-sm"></div> {/* Background with blur */}
-      <div className="relative bg-white p-6 rounded-lg shadow-lg w-[400px]"> {/* Popup content */}
+      <div className="fixed bg-[#d2d2d2] opacity-50 inset-0 backdrop-blur-sm"></div>{" "}
+      {/* Background with blur */}
+      <div className="relative bg-white p-6 rounded-lg shadow-lg w-[400px]">
+        {" "}
+        {/* Popup content */}
         <h2 className="text-xl font-semibold mb-4">
           Which option would you like to choose?
         </h2>
