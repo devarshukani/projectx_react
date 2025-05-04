@@ -3,6 +3,7 @@ import TopNav from "./templates/TopNav";
 import Search from "./templates/Search";
 import SubjectCardSlider from "./templates/SubjectCardSlider";
 import SubjectSlider from "./templates/SubjectSlider";
+import QuizSlider from "./templates/QuizSlider";
 import FixedChatButton from "./templates/FixedChatButton";
 import FeedHome from "./templates/FeedHome";
 import Header from "./templates/Header";
@@ -18,12 +19,15 @@ const Home = () => {
         <div className="mx-[12.5%] mb-10">
           <Search />
         </div>
+
+        {/* Sliding demo lectures cards */}
         <div className="mb-10">
           <SubjectSlider />
         </div>
-        {/* Sliding demo lectures cards */}
-        {/* <SubjectCardSlider /> */}
-
+        <div className="mb-10">
+          <QuizSlider />
+        </div>
+        
         {/* Fixed Chat button in bottom right */}
         <FixedChatButton />
 
