@@ -99,7 +99,7 @@ function App() {
           }
         />
         <Route
-          path="/job/:id"
+          path="/jobs/:jobId"
           element={
             <PrivateRoute>
               <JobDetails />
