@@ -6,7 +6,7 @@ const CrashCourseCard = () => {
 
     return (
         <div
-            className={`transition-all duration-1000 ease-in-out flex flex-col gap-y-3 justify-between min-w-[347px] min-h-[187px] rounded-2xl p-[18px] ${
+            className={`transition-all duration-1000 ease-in-out flex flex-col gap-y-3 justify-between w-85  h-48 rounded-2xl p-[18px] ${
                 isHovered ? 'bg-[#EFF2F8] text-[#235391]' : 'bg-[url("/courseImage.png")] bg-cover bg-center text-[#FFFFFF]'
             }`}
             onMouseEnter={() => setIsHovered(true)}

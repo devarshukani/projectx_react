@@ -26,7 +26,7 @@ const QueOfDaySection = () => {
 
     return (
         <div
-            className="bg-[#F9F9F9] text-[#2A2B2D80] w-full flex flex-col gap-y-[18px] items-center p-6 min-w-[347px]  rounded-2xl"
+            className="bg-[#F9F9F9] text-[#2A2B2D80] w-80 flex flex-col gap-y-[18px] items-center p-6 min-w-[347px]  rounded-2xl"
             style={{ boxShadow: "2px 2px 8px rgba(137, 137, 137, 1)", }}
         >
             <div className="">

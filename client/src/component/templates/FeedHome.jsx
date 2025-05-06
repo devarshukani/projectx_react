@@ -6,6 +6,7 @@ import CrashCourseCard from "./CrashCourseCard";
 import QueOfDaySection from "./QueOfDaySection";
 import Button from "./Button";
 import JobApplicationCard from "./JobApplicationCard";
+import DiscussionFeed from "./DiscussionFeed";
 
 const FeedHome = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -20,42 +21,7 @@ const FeedHome = () => {
     "Videos",
     "Health News/Case studies",
   ];
-  const discussionFeed = [
-    {
-      name: "Rodrickjesferhadley",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris. Maecenas vitae mattis tellus. Nullam quis imperdiet augue. Vestibulum auctorpell Maecenas vitae mattis tellus. Nullam quis imer View More",
-      image: discussionFeedProfilePic,
-      time: "2hr ago",
-      likes: 38,
-      dislikes: 12,
-      comments: 9,
-      shareCount: 10,
-    },
-    {
-      name: "Rodrickjesferhadley",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris. Maecenas vitae mattis tellus. Nullam quis imperdiet augue. Vestibulum auctorpell Maecenas vitae mattis tellus. Nullam quis imer View More",
-      image: discussionFeedProfilePic,
-      time: "2hr ago",
-      likes: 38,
-      dislikes: 12,
-      comments: 9,
-      shareCount: 10,
-    },
-    {
-      name: "Rodrickjesferhadley",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris. Maecenas vitae mattis tellus. Nullam quis imperdiet augue. Vestibulum auctorpell Maecenas vitae mattis tellus. Nullam quis imer View More",
-      image: discussionFeedProfilePic,
-      time: "2hr ago",
-      likes: 38,
-      dislikes: 12,
-      comments: 9,
-      shareCount: 10,
-    },
-  ];
-
+ 
   const jobApplicationContent = [
     {
       role: "UX/UI Designer",
@@ -111,11 +77,7 @@ const FeedHome = () => {
     switch (navSections[selectedIndex]) {
       case "Discussion":
         return (
-          <div className="flex flex-col gap-4">
-            {discussionFeed.map((card, index) => (
-              <DiscussionFeedCard cardContent={card} key={index} />
-            ))}
-          </div>
+          <DiscussionFeed />
         );
       case "Job Application":
         return (
@@ -146,71 +108,89 @@ const FeedHome = () => {
     }
   };
 
+  const handleRefresh = () => {
+    // Add refresh logic here
+    console.log("Refreshing content...");
+  };
+
   return (
-    <div className="grid grid-cols-12 w-full gap-x-[18px] px-6 mt-4">
-      <div className="col-span-7 col-start-2 flex flex-col justify-start gap-8">
-        <SliderNavigation
-          sections={navSections}
-          selectedIndex={selectedIndex}
-          setSelectedIndex={setSelectedIndex}
-        />
-        {renderSectionContent()}
-      </div>
-      <div className="col-span-3 col-start-9 flex flex-col gap-y-6 items-start justify-start">
-        <div className="flex items-center justify-end w-full gap-2 text-sm mb-2">
-          <span className="text-zinc-600">
-            {(currentPage - 1) * itemsPerPage + 1} -{" "}
-            {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
-          </span>
-          <div className="flex gap-1">
-            <button
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-              className={`p-1 ${
-                currentPage === 1 ? "text-gray-300" : "hover:text-[#235391]"
-              } transition-colors`}
-            >
-              <i className="ri-arrow-left-s-line text-xl"></i>
-            </button>
-            <button
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              className={`p-1 ${
-                currentPage === totalPages
-                  ? "text-gray-300"
-                  : "hover:text-[#235391]"
-              } transition-colors`}
-            >
-              <i className="ri-arrow-right-s-line text-xl"></i>
-            </button>
+    <div className="w-full flex justify-center mt-4">
+      <div className="w-[80%] flex flex-col">
+        <div className="grid grid-cols-3 gap-6">
+          <div className="col-span-2">
+            <div className="flex flex-col">
+              <SliderNavigation
+                sections={navSections}
+                selectedIndex={selectedIndex}
+                setSelectedIndex={setSelectedIndex}
+              />
+              {renderSectionContent()}
+            </div>
           </div>
-        </div>
-        <CrashCourseCard />
-        <CrashCourseCard />
-        <QueOfDaySection />
-
-        <div
-          className="p-6 flex flex-col items-start gap-y-7 bg-[#F9F9F9] rounded-2xl min-w-[347px]"
-          style={{ boxShadow: "2px 2px 8px rgba(137, 137, 137, 1)" }}
-        >
-          <div className="flex flex-col gap-y-3 items-start">
-            <p className="text-lg font-semibold">Discuss Now</p>
-            <p className="text-sm">
-              Share interview question <br /> and get solutions
-            </p>
-          </div>
-          <Button name={"Let’s discuss"} />
-        </div>
-
-        <div
-          className="p-6 flex flex-col items-start gap-y-7 bg-[#F9F9F9] rounded-2xl min-w-[347px]"
-          style={{ boxShadow: "2px 2px 8px rgba(137, 137, 137, 1)" }}
-        >
-          <div className="flex flex-col gap-y-3 items-start">
-            <p className="text-lg font-semibold">Discuss Now</p>
-            <p className="text-sm">
-              Share interview question <br /> and get solutions
-            </p>
+          <div className="col-span-1 flex flex-col gap-y-6 items-end">
+            <div className="flex items-center justify-end gap-2 text-sm w-full">
+              <button
+                onClick={handleRefresh}
+                className="p-1 hover:text-[#235391] transition-colors"
+              >
+                <i className="ri-refresh-line text-xl"></i>
+              </button>
+              <span className="text-zinc-600">
+                {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
+                {totalItems}
+              </span>
+              <div className="flex gap-1">
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                  className={`p-1 ${
+                    currentPage === 1 ? "text-gray-300" : "hover:text-[#235391]"
+                  } transition-colors`}
+                >
+                  <i className="ri-arrow-left-s-line text-xl"></i>
+                </button>
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`p-1 ${
+                    currentPage === totalPages
+                      ? "text-gray-300"
+                      : "hover:text-[#235391]"
+                  } transition-colors`}
+                >
+                  <i className="ri-arrow-right-s-line text-xl"></i>
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-y-6 mr-5">
+              <CrashCourseCard />
+              <CrashCourseCard />
+              <QueOfDaySection />
+              <div
+                className="p-6 flex flex-col items-start gap-y-7 bg-[#F9F9F9] rounded-2xl w-full"
+                style={{ boxShadow: "2px 2px 8px rgba(137, 137, 137, 1)" }}
+              >
+                <div className="flex flex-col gap-y-3 items-start">
+                  <p className="text-lg font-semibold">Discuss Now</p>
+                  <p className="text-sm">
+                    Share interview question <br /> and get solutions
+                  </p>
+                </div>
+                <Button name={"Let's discuss"} />
+              </div>
+              <div
+                className="p-6 flex flex-col items-start gap-y-7 bg-[#F9F9F9] rounded-2xl w-full"
+                style={{ boxShadow: "2px 2px 8px rgba(137, 137, 137, 1)" }}
+              >
+                <div className="flex flex-col gap-y-3 items-start">
+                  <p className="text-lg font-semibold">Discuss Now</p>
+                  <p className="text-sm">
+                    Share interview question <br /> and get solutions
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
