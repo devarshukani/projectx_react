@@ -1,7 +1,14 @@
+import { useNavigate } from "react-router-dom";
 
 const JobApplicationCard = ({ cardContent }) => {
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/job/${cardContent.role.toLowerCase().replace(/\s+/g, '-')}`, { state: { jobDetails: cardContent } });
+    };
+
     return (
-        <div className="flex gap-x-6 justify-start items-start w-full">
+        <div onClick={handleClick} className="flex gap-x-6 justify-start items-start w-full mt-8 cursor-pointer hover:bg-gray-50 rounded-lg p-4">
             <div className="w-[68px] h-[68px] rounded-full">
                 <img src={cardContent.companyLogo} alt="profile" />
             </div>

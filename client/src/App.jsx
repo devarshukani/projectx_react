@@ -13,6 +13,7 @@ import SignUp from "./component/SignUp";
 import SignUpOtp from "./component/SignUpOtp";
 import LoginOtp from "./component/LoginOtp";
 import PrivateRoute from "./component/templates/PrivateRoute";
+import JobDetails from "./component/JobDetails";
 
 function App() {
   return (
@@ -94,6 +95,14 @@ function App() {
           element={
             <PrivateRoute>
               <Bookmark />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/job/:id"
+          element={
+            <PrivateRoute>
+              <JobDetails />
             </PrivateRoute>
           }
         />

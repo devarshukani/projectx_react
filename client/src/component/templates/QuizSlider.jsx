@@ -15,7 +15,7 @@ const QuizSlider = () => {
 
   return (
     <div className="w-full flex justify-center">
-      <div className="w-[70%]  rounded-xl p-4 shadow-sm">
+      <div className="w-[80%]  rounded-xl p-4 shadow-sm">
         <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-gray-300">
           <div className="flex gap-6 min-w-max">
             {quizzes.map((quiz, index) => (

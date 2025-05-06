@@ -23,7 +23,7 @@ const SubjectSlider = () => {
 
   return (
     <div className="w-full flex justify-center overflow-hidden">
-      <div className="w-[70%] h-100 rounded-2xl relative">
+      <div className="w-[80%] h-100 rounded-2xl relative">
         {/* Container for all slides */}
         <div
           className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
