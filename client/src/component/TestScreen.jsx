@@ -287,16 +287,16 @@ const TestScreen = () => {
           <div className="sticky bottom-0 w-full h-[14vh] flex justify-between items-center bg-[#f7f7f7]">
             <Button
               name="Previous"
-              color="#dee6f2"
-              textColor="#84888f"
+              color="#4a90e2"
+              textColor="#ffffff"
               onClick={handlePrevious}
             />
 
             <div className="flex gap-4">
               <Button
                 name="Mark"
-                color="#dee6f2"
-                textColor="#84888f"
+                color="#f9b42c"
+                textColor="#ffffff"
                 onClick={handleMark}
               />
               <Button name="Save & next" onClick={handleNext} />

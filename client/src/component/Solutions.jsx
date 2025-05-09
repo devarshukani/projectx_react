@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Header from "./templates/Header";
 import SideNav from "./templates/SideNav";
 import Subject from "./templates/Subject";
@@ -13,6 +13,13 @@ const Solutions = () => {
   const [activeAnswer, setActiveAnswer] = useState(null);
   const [showClaimPanel, setShowClaimPanel] = useState(false);
   const [activeQuestionNo, setActiveQuestionNo] = useState(null);
+  const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [currentTool, setCurrentTool] = useState("pencil");
+  const [drawingEnabled, setDrawingEnabled] = useState(false);
+  const canvasRef = useRef(null);
+  const contextRef = useRef(null);
+  const solutionContainerRef = useRef(null);
 
   const topic = [
     "Medicine",
@@ -120,6 +127,89 @@ const Solutions = () => {
     }
   };
 
+  // Function to handle solution view click
+  const handleSolutionView = (questionId) => {
+    setExpandedQuestionId(
+      expandedQuestionId === questionId ? null : questionId
+    );
+  };
+
+  // Filter questions to show only expanded question when one is selected
+  const questionsToShow = expandedQuestionId
+    ? filteredQuestions.filter((q) => q.question_no === expandedQuestionId)
+    : filteredQuestions;
+
+  useEffect(() => {
+    if (expandedQuestionId && drawingEnabled) {
+      const canvas = canvasRef.current;
+      const container = solutionContainerRef.current;
+      
+      if (canvas && container) {
+        // Set canvas size to match container
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        
+        // Set styles based on current tool
+        if (currentTool === 'highlighter') {
+          ctx.strokeStyle = 'rgba(255, 255, 0, 0.3)';
+          ctx.lineWidth = 20;
+          ctx.globalCompositeOperation = 'multiply';
+        } else if (currentTool === 'pencil') {
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 2;
+          ctx.globalCompositeOperation = 'source-over';
+        } else if (currentTool === 'eraser') {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 20;
+          ctx.globalCompositeOperation = 'destination-out';
+        }
+        
+        contextRef.current = ctx;
+      }
+    }
+  }, [expandedQuestionId, currentTool, drawingEnabled]);
+
+  const startDrawing = ({nativeEvent}) => {
+    if (!drawingEnabled) return;
+    
+    const {offsetX, offsetY} = nativeEvent;
+    contextRef.current.beginPath();
+    contextRef.current.moveTo(offsetX, offsetY);
+    setIsDrawing(true);
+  };
+
+  const draw = ({nativeEvent}) => {
+    if (!isDrawing || !drawingEnabled) return;
+    
+    const {offsetX, offsetY} = nativeEvent;
+    contextRef.current.lineTo(offsetX, offsetY);
+    contextRef.current.stroke();
+  };
+
+  const stopDrawing = () => {
+    if (!drawingEnabled) return;
+    
+    contextRef.current.closePath();
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const toggleDrawing = () => {
+    setDrawingEnabled(!drawingEnabled);
+    if (!drawingEnabled) {
+      setCurrentTool('pencil');
+    }
+  };
+
   return (
     <>
       <SideNav />
@@ -221,11 +311,18 @@ const Solutions = () => {
             {/* Right Side */}
             <div className="w-[65%] space-y-6">
               <div className="w-full bg-zinc-300 rounded-2xl">
-                {" "}
+                {expandedQuestionId && (
+                  <button
+                    onClick={() => setExpandedQuestionId(null)}
+                    className="px-4 py-2 bg-blue-900 text-white rounded-lg mb-4"
+                  >
+                    Back to All Questions
+                  </button>
+                )}
                 <div className="w-[25%] h-4 bg-blue-900 rounded-2xl mb-4"></div>
               </div>
 
-              {filteredQuestions.map((question, idx) => (
+              {questionsToShow.map((question, idx) => (
                 <div key={idx} className="w-full bg-slate-200 rounded-2xl p-4">
                   <div className="w-full bg-neutral-50 rounded-xl shadow-[4px_4px_18px_0px_rgba(180,180,180,0.18)] p-6">
                     {/* Question Header */}
@@ -297,7 +394,7 @@ const Solutions = () => {
                               option === question.answered_option) && (
                               <div className="w-5 h-5 relative">
                                 <div
-                                  className="w-3 absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-stone-50"
+                                  className="w-3 absolute outline-[1.50px] outline-offset-[-0.75px] outline-stone-50"
                                   style={{
                                     height:
                                       option === question.correct_option
@@ -332,7 +429,12 @@ const Solutions = () => {
                         <div className="text-zinc-800 text-sm font-semibold">
                           Solution
                         </div>
-                        <div className="text-emerald-500 text-[10px] font-semibold">
+                        <div
+                          onClick={() =>
+                            handleSolutionView(question.question_no)
+                          }
+                          className="text-emerald-500 text-[10px] font-semibold cursor-pointer hover:text-emerald-600"
+                        >
                           View
                         </div>
                       </div>
@@ -347,6 +449,179 @@ const Solutions = () => {
                         <i className="ri-bookmark-line"></i>
                       </div>
                     </div>
+
+                    {/* Solution Section - Only shown when question is expanded */}
+                    {expandedQuestionId === question.question_no && (
+                      <div className="relative" ref={solutionContainerRef}>
+                        {/* Drawing overlay */}
+                        {drawingEnabled && (
+                          <canvas
+                            ref={canvasRef}
+                            onMouseDown={startDrawing}
+                            onMouseMove={draw}
+                            onMouseUp={stopDrawing}
+                            onMouseLeave={stopDrawing}
+                            className="absolute inset-0 z-10 cursor-crosshair"
+                            style={{ touchAction: 'none' }}
+                          />
+                        )}
+
+                        {/* Drawing tools */}
+                        <div className="sticky top-0 z-20 bg-white shadow-md rounded-lg p-4 mb-4 flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <button 
+                              onClick={toggleDrawing}
+                              className={`p-3 rounded-lg flex items-center gap-2 ${
+                                drawingEnabled ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
+                              }`}
+                            >
+                              <i className="ri-edit-line text-xl"></i>
+                              <span>{drawingEnabled ? 'Disable Drawing' : 'Enable Drawing'}</span>
+                            </button>
+                            
+                            {drawingEnabled && (
+                              <>
+                                <button 
+                                  onClick={() => setCurrentTool('pencil')}
+                                  className={`p-3 rounded-lg flex items-center gap-2 ${
+                                    currentTool === 'pencil' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
+                                  }`}
+                                >
+                                  <i className="ri-pencil-line text-xl"></i>
+                                  <span>Pencil</span>
+                                </button>
+                                <button 
+                                  onClick={() => setCurrentTool('highlighter')}
+                                  className={`p-3 rounded-lg flex items-center gap-2 ${
+                                    currentTool === 'highlighter' ? 'bg-yellow-100 text-yellow-600' : 'hover:bg-gray-100'
+                                  }`}
+                                >
+                                  <i className="ri-mark-pen-line text-xl"></i>
+                                  <span>Highlighter</span>
+                                </button>
+                                <button 
+                                  onClick={() => setCurrentTool('eraser')}
+                                  className={`p-3 rounded-lg flex items-center gap-2 ${
+                                    currentTool === 'eraser' ? 'bg-red-100 text-red-600' : 'hover:bg-gray-100'
+                                  }`}
+                                >
+                                  <i className="ri-eraser-line text-xl"></i>
+                                  <span>Eraser</span>
+                                </button>
+                                <button 
+                                  onClick={clearCanvas}
+                                  className="p-3 rounded-lg flex items-center gap-2 hover:bg-gray-100"
+                                >
+                                  <i className="ri-delete-bin-line text-xl"></i>
+                                  <span>Clear All</span>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="relative z-0">
+                          {/* Solution content */}
+                          <div className="mt-6 pt-6 border-t border-gray-200">
+                            <h3 className="text-xl font-semibold mb-4">
+                              Solution
+                            </h3>
+                            <div className="mb-6">
+                              <span className="font-semibold">
+                                Correct Answer:{" "}
+                              </span>
+                              <span>{question.correct_option}</span>
+                            </div>
+
+                            {/* Solution explanation */}
+                            <div className="mb-6">
+                              <h4 className="font-semibold mb-2">Explanation:</h4>
+                              <p className="text-gray-700">
+                                Trigeminal neuralgia is characterized by episodes
+                                of severe facial pain that last from a few seconds
+                                to several minutes. It typically affects one side
+                                of the face and is often triggered by normal daily
+                                activities. This condition is not typically
+                                associated with loss of consciousness or falls,
+                                making it the incorrect choice in this scenario.
+                              </p>
+                            </div>
+
+                            {/* Key Points */}
+                            <div className="mb-6">
+                              <h4 className="font-semibold mb-2">Key Points:</h4>
+                              <ul className="list-disc pl-6 space-y-2 text-gray-700">
+                                <li>
+                                  Epilepsy can cause brief lapses of consciousness
+                                </li>
+                                <li>
+                                  Syncope is characterized by temporary loss of
+                                  consciousness
+                                </li>
+                                <li>
+                                  Migraine can be associated with aura and
+                                  occasional loss of consciousness
+                                </li>
+                                <li>
+                                  Trigeminal neuralgia does not typically cause
+                                  loss of consciousness
+                                </li>
+                              </ul>
+                            </div>
+
+                            {/* Reference Image if available */}
+                            {question.solution_image && (
+                              <div className="mb-6">
+                                <h4 className="font-semibold mb-2">
+                                  Reference Image:
+                                </h4>
+                                <img
+                                  src={question.solution_image}
+                                  alt="Solution reference"
+                                  className="max-w-full rounded-lg shadow-md"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Additional Resources */}
+                          <div className="mt-6 p-6 bg-gray-50 rounded-lg">
+                            <h4 className="font-semibold mb-4">
+                              Additional Resources
+                            </h4>
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-3">
+                                <i className="ri-video-line text-blue-600"></i>
+                                <a
+                                  href="#"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Watch related video lecture
+                                </a>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <i className="ri-file-text-line text-blue-600"></i>
+                                <a
+                                  href="#"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Download PDF notes
+                                </a>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <i className="ri-question-line text-blue-600"></i>
+                                <a
+                                  href="#"
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Practice similar questions
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
