@@ -29,17 +29,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (localPhoneNumber.length === 10) {
-      const fullPhoneNumber = `${selectedCountry.code}${localPhoneNumber}`;
       dispatch(setLoading(true));
       try {
-        await sendOtp(fullPhoneNumber, "login");
+        // Store phone number in Redux and navigate to OTP page
         dispatch(setPhoneNumber(localPhoneNumber));
-        dispatch(setOtpSent(true));
-        navigate("/login-otp", {
-          state: { phoneNumber: localPhoneNumber },
-        });
+        navigate("/login-otp");
       } catch (err) {
-        dispatch(setError(err.message || "Failed to send OTP"));
+        dispatch(setError(err.message || "Failed to process request"));
+      } finally {
+        dispatch(setLoading(false));
       }
     } else {
       dispatch(setError("Please enter a valid 10-digit phone number"));

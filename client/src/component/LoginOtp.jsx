@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess, setError, setLoading } from "../redux/slices/authSlice";
@@ -9,6 +9,13 @@ const LoginOtp = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { phoneNumber, loading, error } = useSelector((state) => state.auth);
+
+  // If no phone number in state, redirect back to login
+  useEffect(() => {
+    if (!phoneNumber) {
+      navigate("/login");
+    }
+  }, [phoneNumber, navigate]);
 
   const getMaskedPhoneNumber = (number) => {
     if (!number) return "";
@@ -21,12 +28,19 @@ const LoginOtp = () => {
     if (otp.length === 6) {
       dispatch(setLoading(true));
       try {
-        const response = await verifyOtp(phoneNumber, otp, "login");
+        // First verify the hardcoded OTP and get user data
+        const response = await verifyOtp(phoneNumber, otp);
+
+        // If successful, store user data and navigate
         dispatch(loginSuccess(response.user));
-        navigate("/"); // Navigate to home after successful login
+        navigate("/");
       } catch (err) {
         dispatch(setError(err.message || "Failed to verify OTP"));
+      } finally {
+        dispatch(setLoading(false));
       }
+    } else {
+      dispatch(setError("Please enter a valid 6-digit OTP"));
     }
   };
 
