@@ -41,13 +41,15 @@ export const getUserById = async (userId) => {
 
 export const fetchTests = async (page = 1, limit = 10) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/tests?page=${page}&limit=${limit}`);
+    const response = await fetch(
+      `${API_BASE_URL}/api/tests?page=${page}&limit=${limit}`
+    );
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error("Network response was not ok");
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching tests:', error);
-    throw new Error('Failed to fetch tests');
+    console.error("Error fetching tests:", error);
+    throw new Error("Failed to fetch tests");
   }
 };
