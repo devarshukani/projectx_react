@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 const StartTestPopup = ({ isOpen, onClose, testData }) => {
   const [allowChangeAnswer, setAllowChangeAnswer] = useState(true);
   const navigate = useNavigate();
-
   const handlePopupSubmit = () => {
+    // Pass both the test ID and settings to TestScreen
     navigate("/test/testscreen", {
       state: {
+        testId: testData.id,
         allowChangeAnswer,
         testData,
       },

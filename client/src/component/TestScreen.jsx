@@ -17,41 +17,59 @@ const TestScreen = () => {
   const [unansweredCount, setUnansweredCount] = useState(0);
   const [skippedCount, setSkippedCount] = useState(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(3600);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [timerStarted, setTimerStarted] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [testDetails, setTestDetails] = useState(null);
   const timerRef = useRef(null);
   const location = useLocation();
+  const testId = location.state?.testId; // Get test ID from location state
 
   // Track question status for each question
   const [questionStatuses, setQuestionStatuses] = useState({});
 
   useEffect(() => {
-    fetchQuestions();
+    fetchTestDetails();
   }, []);
 
-  const fetchQuestions = async () => {
+  const fetchTestDetails = async () => {
+    if (!testId) {
+      console.error("Test ID is not available");
+      setLoading(false);
+      return;
+    }
     try {
-      const response = await fetch(
-        "http://13.203.220.236/api/questions?page=1&limit=10"
-      );
+      setLoading(true);
+      console.log("Fetching test details for test ID:", testId);
+      const response = await fetch(`http://13.203.220.236/api/tests/${testId}`);
+
+      console.log("Response from test details API:", response);
       const data = await response.json();
-      if (data.success) {
-        setQuestions(data.data);
-        setUnansweredCount(data.data.length);
-        setLoading(false);
+      if (data.success && data.data) {
+        setTestDetails(data.data);
+        // Set questions from test data
+        setQuestions(data.data.questions);
+        setUnansweredCount(data.data.questions.length);
 
         // Initialize question statuses
         const initialStatuses = {};
-        data.data.forEach((q) => {
+        data.data.questions.forEach((q) => {
           initialStatuses[q.id] = {
             status: "unanswered",
             selectedOption: null,
           };
         });
         setQuestionStatuses(initialStatuses);
+
+        // Set initial time from test duration (converting minutes to seconds)
+        const duration = parseInt(data.data.duration) || 90; // Default to 90 if not set
+        console.log("Setting test duration:", duration, "minutes");
+        setTimeLeft(duration * 60);
+        setTimerStarted(true); // Set timer as started when we get the duration
+        setLoading(false);
       }
     } catch (error) {
-      console.error("Error fetching questions:", error);
+      console.error("Error fetching test details:", error);
       setLoading(false);
     }
   };
@@ -168,6 +186,32 @@ const TestScreen = () => {
     }
   };
 
+  const handleClearAttempt = () => {
+    const currentQuestion = questions[currentQuestionIndex];
+
+    // Clear the selected option
+    setSelectedOption(null);
+
+    // Update question status
+    setQuestionStatuses((prev) => ({
+      ...prev,
+      [currentQuestion.id]: {
+        status: "unanswered",
+        selectedOption: null,
+      },
+    }));
+
+    // Update counts
+    const prevStatus = questionStatuses[currentQuestion.id]?.status;
+    if (prevStatus === "answered") {
+      setAnsweredCount((prev) => prev - 1);
+      setUnansweredCount((prev) => prev + 1);
+    } else if (prevStatus === "marked") {
+      setMarkedCount((prev) => prev - 1);
+      setUnansweredCount((prev) => prev + 1);
+    }
+  };
+
   // Get color for question icon based on status
   const getQuestionColor = (questionId) => {
     const status = questionStatuses[questionId]?.status;
@@ -188,21 +232,35 @@ const TestScreen = () => {
         return "#cbcdd2"; // grey for unanswered
     }
   };
-
   useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev > 0) {
-          return prev - 1;
-        } else {
-          clearInterval(timerRef.current);
-          return 0;
-        }
-      });
-    }, 1000);
+    // Start timer when we get test details and have non-zero timeLeft
+    if (timerStarted && timeLeft > 0) {
+      console.log("Starting timer with", timeLeft, "seconds");
+      // Clear any existing timer first
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      // Start new timer
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          const newTime = prev - 1;
+          if (newTime <= 0) {
+            clearInterval(timerRef.current);
+            return 0;
+          }
+          return newTime;
+        });
+      }, 1000);
+    }
 
-    return () => clearInterval(timerRef.current);
-  }, []);
+    // Cleanup function
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [timerStarted]); // Only depend on timerStarted since we handle timeLeft updates internally// Depend on both timerStarted and timeLeft
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -215,10 +273,11 @@ const TestScreen = () => {
   return (
     <div className="w-full flex flex-row h-screen">
       <div className="relative flex flex-col px-[6%] pt-[3%] h-full w-[76%] bg-[#f7f7f7] overflow-x-hidden overflow-y-auto">
+        {" "}
         <div className="flex items-center justify-between">
           <h1>logo</h1>
           <h1 className="text-zinc-800 text-3xl font-semibold">
-            Mecee PG 2025
+            {testDetails?.name || "Loading..."}
           </h1>
           <div className=" text-center w-24 h-12 bg-gray-200 rounded-lg flex justify-center items-center">
             <h1 className="justify-center text-zinc-800 text-3xl font-semibold">
@@ -300,14 +359,22 @@ const TestScreen = () => {
                 onClick={handleMark}
               />
               <Button name="Save & next" onClick={handleNext} />
+              <Button
+                name="Clear Attempt"
+                color="#db4545"
+                textColor="#ffffff"
+                onClick={handleClearAttempt}
+              />
             </div>
           </div>
         </div>
       </div>
-
       <div className="px-[2%] pt-[3%] h-full w-[24%] bg-[#eaebee] flex flex-col">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Medical Test 1</h1>
+          {" "}
+          <h1 className="text-xl font-semibold">
+            {testDetails?.name || "Loading..."}
+          </h1>
           <div className="flex gap-3">
             <Link
               to="#"
@@ -392,8 +459,8 @@ const TestScreen = () => {
           unanswered={unansweredCount}
           onClose={() => setShowSubmitModal(false)}
         />
-      )}
-      {!timeLeft && (
+      )}{" "}
+      {timerStarted && timeLeft === 0 && (
         <TimeUp
           answered={answeredCount}
           marked={markedCount}
