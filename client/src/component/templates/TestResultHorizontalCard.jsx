@@ -25,13 +25,13 @@ const TestResultHorizontalCard = (props) => {
             25/60
           </h1>
           <div className="absolute bottom-[10%] flex gap-5">
-            <button
-              // onClick={handleAttemptTestClick}
+            <Link
+              
               
               className="bg-[#235391] text-xl px-5 py-3 rounded-lg font-semibold text-white hover:cursor-pointer"
             >
               View Solutions
-            </button>
+            </Link>
 
             <Link onClick={()=>setQae(!qae)} className="bg-[#ffffff] text-xl px-5 py-3 rounded-lg font-semibold text-[#235391] border-3">
               Request QAE

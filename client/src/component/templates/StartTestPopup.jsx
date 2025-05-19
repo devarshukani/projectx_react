@@ -1,20 +1,38 @@
 // startTestPopUp.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { createTestAttempt } from "../../services/apiService";
 
 const StartTestPopup = ({ isOpen, onClose, testData }) => {
   const [allowChangeAnswer, setAllowChangeAnswer] = useState(true);
   const navigate = useNavigate();
-  const handlePopupSubmit = () => {
-    // Pass both the test ID and settings to TestScreen
-    navigate("/test/testscreen", {
-      state: {
+  const { user } = useSelector((state) => state.auth);
+
+  const handlePopupSubmit = async () => {
+    try {
+      console.log("Creating test attempt...", {
         testId: testData.id,
-        allowChangeAnswer,
-        testData,
-      },
-    });
-    onClose();
+        userId: user.id,
+      });
+
+      // Send test attempt request
+      const response = await createTestAttempt(testData.id, user.id);
+      console.log("Test attempt created successfully:", response);
+
+      // If successful, navigate to test screen
+      navigate("/test/testscreen", {
+        state: {
+          testId: testData.id,
+          allowChangeAnswer,
+          testData,
+        },
+      });
+      onClose();
+    } catch (error) {
+      console.error("Error creating test attempt:", error);
+      // You might want to show an error message to the user here
+    }
   };
 
   if (!isOpen) return null;

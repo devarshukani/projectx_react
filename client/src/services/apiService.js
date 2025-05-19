@@ -28,6 +28,21 @@ export const verifyOtp = async (phoneNumber, otp) => {
   return { success: true, user };
 };
 
+export const fetchUsers = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users`);
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to fetch users");
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error("Failed to fetch users: " + error.message);
+  }
+};
+
 export const getUserById = async (userId) => {
   const response = await fetch(`${API_BASE_URL}/api/users/${userId}`);
   const data = await response.json();
@@ -37,6 +52,31 @@ export const getUserById = async (userId) => {
   }
 
   return data.user;
+};
+
+export const createTestAttempt = async (testId, userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/test-attempts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        test_id: testId,
+        user_id: userId,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to create test attempt");
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error("Failed to create test attempt: " + error.message);
+  }
 };
 
 export const fetchTests = async (page = 1, limit = 10) => {

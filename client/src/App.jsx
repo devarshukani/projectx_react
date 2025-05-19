@@ -85,9 +85,7 @@ function App() {
         <Route
           path="/test/solution"
           element={
-            <PrivateRoute>
               <Solutions />
-            </PrivateRoute>
           }
         />
         <Route

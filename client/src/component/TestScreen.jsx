@@ -215,12 +215,12 @@ const TestScreen = () => {
   // Get color for question icon based on status
   const getQuestionColor = (questionId) => {
     const status = questionStatuses[questionId]?.status;
-    console.log(
-      "Getting color for question",
-      questionId,
-      "with status:",
-      status
-    );
+    // console.log(
+    //   "Getting color for question",
+    //   questionId,
+    //   "with status:",
+    //   status
+    // );
     switch (status) {
       case "answered":
         return "#298548"; // green

@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setPhoneNumber,
-  setOtpSent,
+  loginSuccess,
   setLoading,
   setError,
 } from "../redux/slices/authSlice";
-import { sendOtp } from "../services/apiService";
+import { fetchUsers } from "../services/apiService";
 
 const countryList = [
   { code: "+91", country: "India" },
@@ -31,9 +31,17 @@ const Login = () => {
     if (localPhoneNumber.length === 10) {
       dispatch(setLoading(true));
       try {
-        // Store phone number in Redux and navigate to OTP page
-        dispatch(setPhoneNumber(localPhoneNumber));
-        navigate("/login-otp");
+        // Fetch users and find matching phone number
+        const response = await fetchUsers();
+        const user = response.users.find((u) => u.phone === localPhoneNumber);
+
+        if (!user) {
+          throw new Error("No user found with this phone number");
+        }
+
+        // Store user data in Redux and navigate to home
+        dispatch(loginSuccess(user));
+        navigate("/");
       } catch (err) {
         dispatch(setError(err.message || "Failed to process request"));
       } finally {

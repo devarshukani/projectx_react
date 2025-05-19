@@ -1,10 +1,11 @@
 // testInfo.jsx
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import trendingImg from "/trending_img.png";
 import timerIcon from "/timer.png";
 import languageIcon from "/lang.png";
-import StartTestPopup from "./startTestPopUp";
+import StartTestPopup from "./StartTestPopup";
 
 const TestInfo = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -13,6 +14,8 @@ const TestInfo = () => {
   const [testData, setTestData] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchTestData = async () => {
@@ -39,6 +42,11 @@ const TestInfo = () => {
   }, [location]);
 
   const handleAttemptTestClick = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
     if (instructionsChecked) {
       setIsPopupOpen(true);
       setErrorMessage("");
