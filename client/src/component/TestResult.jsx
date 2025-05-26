@@ -74,7 +74,7 @@ const TestResult = () => {
             testId={testId}
             attemptId={attemptId}
           />
-          
+        
           <ResultQuestionGraph 
             correct={testScores?.performance?.correct_questions}
             incorrect={testScores?.performance?.incorrect_questions}
