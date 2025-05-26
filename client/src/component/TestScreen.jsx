@@ -186,32 +186,6 @@ const TestScreen = () => {
     }
   };
 
-  const handleClearAttempt = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-
-    // Clear the selected option
-    setSelectedOption(null);
-
-    // Update question status
-    setQuestionStatuses((prev) => ({
-      ...prev,
-      [currentQuestion.id]: {
-        status: "unanswered",
-        selectedOption: null,
-      },
-    }));
-
-    // Update counts
-    const prevStatus = questionStatuses[currentQuestion.id]?.status;
-    if (prevStatus === "answered") {
-      setAnsweredCount((prev) => prev - 1);
-      setUnansweredCount((prev) => prev + 1);
-    } else if (prevStatus === "marked") {
-      setMarkedCount((prev) => prev - 1);
-      setUnansweredCount((prev) => prev + 1);
-    }
-  };
-
   // Get color for question icon based on status
   const getQuestionColor = (questionId) => {
     const status = questionStatuses[questionId]?.status;
@@ -359,12 +333,6 @@ const TestScreen = () => {
                 onClick={handleMark}
               />
               <Button name="Save & next" onClick={handleNext} />
-              <Button
-                name="Clear Attempt"
-                color="#db4545"
-                textColor="#ffffff"
-                onClick={handleClearAttempt}
-              />
             </div>
           </div>
         </div>
@@ -440,7 +408,11 @@ const TestScreen = () => {
               return (
                 <div
                   key={index}
-                  onClick={() => setCurrentQuestionIndex(index)}
+                  onClick={() => {
+                    setCurrentQuestionIndex(index);
+                    // Set the selected option when clicking on question numbers
+                    setSelectedOption(questionStatuses[question.id]?.selectedOption || null);
+                  }}
                   className="cursor-pointer"
                 >
                   <QuestionIcon
