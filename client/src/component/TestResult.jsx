@@ -71,6 +71,8 @@ const TestResult = () => {
             totalMarks={testScores?.performance?.total_marks}
             timeTaken={testScores?.performance?.total_time_taken_formatted}
             date={testDetails?.date}
+            testId={testId}
+            attemptId={attemptId}
           />
           
           <ResultQuestionGraph 

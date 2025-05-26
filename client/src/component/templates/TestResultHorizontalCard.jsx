@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import RequestQAE from "./RequestQAE";
 import EmailSent from "./EmailSent";
 
-const TestResultHorizontalCard = ({ title, score, totalMarks, timeTaken, date }) => {
+const TestResultHorizontalCard = ({ title, score, totalMarks, timeTaken, date, testId, attemptId }) => {
   const [qae, setQae] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
@@ -40,7 +40,7 @@ const TestResultHorizontalCard = ({ title, score, totalMarks, timeTaken, date })
 
           <div className="absolute bottom-[10%] flex gap-5">
             <Link
-              to="solutions"
+              to={`/test/solution/${testId}/${attemptId}`}
               className="bg-[#235391] text-xl px-5 py-3 rounded-lg font-semibold text-white hover:cursor-pointer"
             >
               View Solutions
