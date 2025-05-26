@@ -93,7 +93,7 @@ const LeaderBoardList = () => {
           <div className="space-y-3">
             {[...Array(10)].map((_, index) => (
               <div
-                key={index}
+                key={`leaderboard-rank-${index + 4}`}
                 className="flex items-center justify-between px-5 py-3 hover:bg-gray-100 rounded-lg"
               >
                 <div className="flex items-center gap-4">

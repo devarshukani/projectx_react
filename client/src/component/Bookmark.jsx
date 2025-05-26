@@ -92,7 +92,7 @@ const Bookmark = () => {
       <div className="grid grid-cols-2 gap-6">
         {[...Array(bookmarkCount)].map((_, index) => (
           <div
-            key={index}
+            key={`${activeTopic}-bookmark-${index}`}
             className="group relative pl-3 hover:bg-[#dde7f9] transition-all duration-300 ease-in-out rounded-lg bg-[#fafafa] cursor-pointer"
           >
             <div className="absolute left-0 h-full w-1 bg-[#235391] rounded-full opacity-100"></div>

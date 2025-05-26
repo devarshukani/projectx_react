@@ -155,8 +155,19 @@ const TestScreen = () => {
           console.log("Answer updated successfully:", response);
         } else {
           console.log("Submitting new answer...");
-          const response = await submitTestAttemptAnswer(answerData);
-          console.log("New answer submitted successfully:", response);
+          try {
+            const response = await submitTestAttemptAnswer(answerData);
+            console.log("New answer submitted successfully:", response);
+          } catch (error) {
+            // If we get "already exists" error, try updating instead
+            if (error.message?.includes("Answer already exists")) {
+              console.log("Answer exists, trying update instead...");
+              const updateResponse = await updateTestAttemptAnswer(answerData);
+              console.log("Answer updated successfully:", updateResponse);
+            } else {
+              throw error; // Re-throw if it's a different error
+            }
+          }
         }
       } catch (apiError) {
         console.error("API call failed:", apiError);
@@ -297,7 +308,11 @@ const TestScreen = () => {
       // First save any unsaved answer for current question
       const currentQuestion = questions[currentQuestionIndex];
       if (currentQuestion && selectedOption) {
-        await saveAnswer(currentQuestion.id, selectedOption, false);
+        try {
+          await saveAnswer(currentQuestion.id, selectedOption, false);
+        } catch (saveError) {
+          console.warn("Error saving final answer, continuing with test submission:", saveError);
+        }
       }
 
       // Close the test attempt
@@ -322,6 +337,7 @@ const TestScreen = () => {
     } catch (error) {
       console.error("Failed to submit test:", error);
       // TODO: Show error message to user
+      // Don't close the modal if submission failed
     }
   };
 
@@ -418,8 +434,12 @@ const TestScreen = () => {
                       Question {currentQuestionIndex + 1}
                     </h1>
                     <div className="flex gap-3">
-                      <p className="text-green-700">+4 marks</p>
-                      <p className="text-red-500">-1 marks</p>
+                      <p className="text-green-700">
+                        +{testDetails?.correct_marks} marks
+                      </p>
+                      <p className="text-red-500">
+                        {testDetails?.incorrect_marks} marks
+                      </p>
                     </div>
                   </div>
 

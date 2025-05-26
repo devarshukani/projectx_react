@@ -168,9 +168,9 @@ const ClaimPanel = ({ onClose, questionNo, userName = "Vinay Vyas" }) => {
         {/* Editing Options */}
 
         <div className="flex items-center gap-3 mb-4 p-2 border-t border-b">
-          {textEditingOptions.map((option, index) => (
+          {textEditingOptions.map((option) => (
             <button
-              key={index}
+              key={option.title}
               className="p-2 hover:bg-gray-100 rounded"
               title={option.title}
               onClick={() => formatText(option.action)}

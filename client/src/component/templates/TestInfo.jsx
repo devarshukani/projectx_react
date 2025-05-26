@@ -123,8 +123,8 @@ const TestInfo = () => {
         )}
         <h1 className="text-3xl font-semibold text-black">Instructions</h1>
         <ul className="mx-3 text-zinc-600 gap-4 flex flex-col list-disc list-inside">
-          {testData.instructions.map((instruction, index) => (
-            <li key={index}>{instruction}</li>
+          {testData.instructions.map((instruction) => (
+            <li key={`instruction-${instruction.slice(0, 20)}`}>{instruction}</li>
           ))}
         </ul>
 
