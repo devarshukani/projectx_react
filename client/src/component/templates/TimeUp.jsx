@@ -24,12 +24,12 @@ const TimeUp = ({ answered, marked, unanswered, onClose }) => {
             </div>
     
             <div className="flex justify-end gap-4">
-              <Link
-                to="/test/result"
+              <button
+                onClick={onClose}
                 className="px-4 py-2 bg-[#235391] text-white rounded hover:bg-red-700"
               >
                 Continue
-              </Link>
+              </button>
             </div>
           </div>
         </div>

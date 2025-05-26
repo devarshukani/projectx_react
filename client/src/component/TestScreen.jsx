@@ -1,4 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import {
+  submitTestAttemptAnswer,
+  updateTestAttemptAnswer,
+  closeTestAttempt,
+} from "../services/apiService.jsx";
 import timer from "/timer.svg";
 import QuestionOption from "./templates/QuestionOption";
 import { Link } from "react-router-dom";
@@ -6,7 +13,6 @@ import QuestionIcon from "./templates/QuestionIcon";
 import Button from "./templates/Button";
 import SubmitTestModal from "./templates/SubmitTestModal";
 import TimeUp from "./templates/TimeUp";
-import { useLocation } from "react-router-dom";
 
 const TestScreen = () => {
   const [questions, setQuestions] = useState([]);
@@ -23,10 +29,21 @@ const TestScreen = () => {
   const [testDetails, setTestDetails] = useState(null);
   const timerRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const testId = location.state?.testId; // Get test ID from location state
+  const attemptId = location.state?.attemptId; // Get attempt ID from location state
+  const { user } = useSelector((state) => state.auth);
+
+  // Log the attempt ID for verification
+  useEffect(() => {
+    console.log("Test attempt ID:", attemptId);
+  }, [attemptId]);
 
   // Track question status for each question
   const [questionStatuses, setQuestionStatuses] = useState({});
+
+  // Track question start times
+  const [questionStartTimes, setQuestionStartTimes] = useState({});
 
   useEffect(() => {
     fetchTestDetails();
@@ -74,9 +91,91 @@ const TestScreen = () => {
     }
   };
 
-  const handleOptionSelect = (optionId) => {
-    console.log("Option selected:", optionId);
+  useEffect(() => {
+    // Record start time when current question changes
     const currentQuestion = questions[currentQuestionIndex];
+    if (currentQuestion) {
+      setQuestionStartTimes((prev) => ({
+        ...prev,
+        [currentQuestion.id]: Date.now(),
+      }));
+    }
+  }, [currentQuestionIndex, questions]);
+
+  // Function to calculate time taken on current question
+  const getTimeTaken = (questionId) => {
+    const startTime = questionStartTimes[questionId];
+    if (!startTime) return 0;
+    return Math.floor((Date.now() - startTime) / 1000); // Convert to seconds
+  };
+
+  const saveAnswer = async (questionId, optionId, isSkipped = false) => {
+    try {
+      console.log("saveAnswer called with:", {
+        questionId,
+        optionId,
+        isSkipped,
+        attemptId,
+        userId: user?.id,
+      });
+
+      if (!attemptId) {
+        console.error("Missing attemptId - cannot save answer");
+        return;
+      }
+
+      if (!user?.id) {
+        console.error("Missing user ID - cannot save answer");
+        return;
+      }
+
+      const answerData = {
+        test_attempt_id: attemptId,
+        user_id: user.id,
+        test_id: testId,
+        question_id: questionId,
+        selected_option: optionId,
+        time_taken: getTimeTaken(questionId),
+        is_skipped: isSkipped,
+      };
+
+      console.log("Constructed answer data:", answerData);
+
+      // Check if this question was already answered
+      const existingAnswer = questionStatuses[questionId]?.selectedOption;
+      console.log("Existing answer status:", {
+        hasExistingAnswer: !!existingAnswer,
+        existingOption: existingAnswer,
+      });
+
+      try {
+        if (existingAnswer) {
+          console.log("Updating existing answer...");
+          const response = await updateTestAttemptAnswer(answerData);
+          console.log("Answer updated successfully:", response);
+        } else {
+          console.log("Submitting new answer...");
+          const response = await submitTestAttemptAnswer(answerData);
+          console.log("New answer submitted successfully:", response);
+        }
+      } catch (apiError) {
+        console.error("API call failed:", apiError);
+        console.error("API error details:", {
+          message: apiError.message,
+          response: apiError.response?.data,
+        });
+        throw apiError;
+      }
+    } catch (error) {
+      console.error("Error in saveAnswer:", error);
+      throw error;
+    }
+  };
+
+  const handleOptionSelect = (optionId) => {
+    console.log("handleOptionSelect triggered with optionId:", optionId);
+    const currentQuestion = questions[currentQuestionIndex];
+    console.log("Current question:", currentQuestion);
 
     setSelectedOption(optionId);
 
@@ -137,40 +236,47 @@ const TestScreen = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     console.log("Save & Next clicked");
     const currentQuestion = questions[currentQuestionIndex];
     const currentStatus = questionStatuses[currentQuestion.id];
 
-    // If question is unanswered and not marked, mark it as skipped
-    if (
-      currentStatus.status === "unanswered" &&
-      !currentStatus.selectedOption
-    ) {
-      console.log("Marking as skipped");
-      setQuestionStatuses((prev) => {
-        const newStatus = {
-          ...prev,
-          [currentQuestion.id]: {
-            ...prev[currentQuestion.id],
-            status: "skipped",
-          },
-        };
-        console.log("New question statuses after skipping:", newStatus);
-        return newStatus;
-      });
-      setSkippedCount((prev) => prev + 1);
-      setUnansweredCount((prev) => prev - 1);
-    }
+    try {
+      // If there's a selected option, save it
+      if (selectedOption || currentStatus.selectedOption) {
+        const optionToSave = selectedOption || currentStatus.selectedOption;
+        await saveAnswer(currentQuestion.id, optionToSave, false);
+      }
+      // If question is unanswered and not marked, mark it as skipped
+      else if (currentStatus.status === "unanswered" && !currentStatus.selectedOption) {
+        console.log("Marking as skipped");
+        await saveAnswer(currentQuestion.id, null, true);
 
-    // Move to next question if available
-    if (currentQuestionIndex < questions.length - 1) {
-      console.log("Moving to next question");
-      setCurrentQuestionIndex((prev) => prev + 1);
-      const nextQuestion = questions[currentQuestionIndex + 1];
-      setSelectedOption(
-        questionStatuses[nextQuestion.id]?.selectedOption || null
-      );
+        setQuestionStatuses((prev) => {
+          const newStatus = {
+            ...prev,
+            [currentQuestion.id]: {
+              ...prev[currentQuestion.id],
+              status: "skipped",
+            },
+          };
+          console.log("New question statuses after skipping:", newStatus);
+          return newStatus;
+        });
+        setSkippedCount((prev) => prev + 1);
+        setUnansweredCount((prev) => prev - 1);
+      }
+
+      // Move to next question if available
+      if (currentQuestionIndex < questions.length - 1) {
+        console.log("Moving to next question");
+        setCurrentQuestionIndex((prev) => prev + 1);
+        const nextQuestion = questions[currentQuestionIndex + 1];
+        setSelectedOption(questionStatuses[nextQuestion.id]?.selectedOption || null);
+      }
+    } catch (error) {
+      console.error("Error in handleNext:", error);
+      // You might want to show an error message to the user here
     }
   };
 
@@ -183,6 +289,39 @@ const TestScreen = () => {
       setSelectedOption(
         questionStatuses[prevQuestion.id]?.selectedOption || null
       );
+    }
+  };
+
+  const handleTestSubmit = async () => {
+    try {
+      // First save any unsaved answer for current question
+      const currentQuestion = questions[currentQuestionIndex];
+      if (currentQuestion && selectedOption) {
+        await saveAnswer(currentQuestion.id, selectedOption, false);
+      }
+
+      // Close the test attempt
+      const response = await closeTestAttempt(attemptId, user.id);
+      console.log("Test attempt closed successfully:", response);
+
+      // Hide modals
+      setShowSubmitModal(false);
+
+      // Navigate to results
+      navigate("/test/result", {
+        state: {
+          testId,
+          attemptId,
+          stats: {
+            answered: answeredCount,
+            marked: markedCount,
+            unanswered: unansweredCount,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Failed to submit test:", error);
+      // TODO: Show error message to user
     }
   };
 
@@ -411,7 +550,9 @@ const TestScreen = () => {
                   onClick={() => {
                     setCurrentQuestionIndex(index);
                     // Set the selected option when clicking on question numbers
-                    setSelectedOption(questionStatuses[question.id]?.selectedOption || null);
+                    setSelectedOption(
+                      questionStatuses[question.id]?.selectedOption || null
+                    );
                   }}
                   className="cursor-pointer"
                 >
@@ -430,6 +571,7 @@ const TestScreen = () => {
           marked={markedCount}
           unanswered={unansweredCount}
           onClose={() => setShowSubmitModal(false)}
+          onSubmit={handleTestSubmit}
         />
       )}{" "}
       {timerStarted && timeLeft === 0 && (
@@ -437,7 +579,7 @@ const TestScreen = () => {
           answered={answeredCount}
           marked={markedCount}
           unanswered={unansweredCount}
-          onClose={() => setShowSubmitModal(false)}
+          onClose={handleTestSubmit}
         />
       )}
     </div>

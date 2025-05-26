@@ -247,3 +247,231 @@ export const updateProfile = async (userData) => {
 export const updateNotificationSettings = async (settings) => {
   return putData("profile/notifications", settings);
 };
+
+// Test attempt services
+export const closeTestAttempt = async (attemptId, userId, reason = "completed") => {
+  return putData(`test-attempts/${attemptId}/close`, {
+    user_id: userId,
+    reason
+  });
+};
+
+// Test attempt answer services
+export const submitTestAttemptAnswer = async (answerData) => {
+  console.log("API: Submitting test attempt answer:", answerData);
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/test-attempt-answers/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        test_attempt_id: answerData.test_attempt_id,
+        user_id: answerData.user_id,
+        test_id: answerData.test_id,
+        question_id: answerData.question_id,
+        selected_option: answerData.selected_option,
+        time_taken: answerData.time_taken,
+        is_skipped: answerData.is_skipped
+      })
+    });
+
+    const data = await response.json();
+    console.log("API: Submit answer response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to submit answer");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("API: Error submitting answer:", error);
+    throw error;
+  }
+};
+
+export const updateTestAttemptAnswer = async (answerData) => {
+  // Since we're using the same endpoint for both submit and update,
+  // just call submitTestAttemptAnswer
+  return submitTestAttemptAnswer(answerData);
+};
+
+const API_BASE_URL = "http://13.203.220.236";
+
+// Auth Services with direct fetch
+export const sendOtpDirect = async (phoneNumber, type) => {
+  // For now, we'll just simulate OTP sending
+  return Promise.resolve({ success: true });
+};
+
+export const verifyOtpDirect = async (phoneNumber, otp) => {
+  // Hardcoded OTP verification
+  if (otp !== "123456") {
+    throw new Error("Invalid OTP");
+  }
+
+  // If OTP is correct, fetch users to find matching phone number
+  const response = await fetch(`${API_BASE_URL}/api/users`);
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error("Failed to verify user");
+  }
+
+  // Find user with matching phone number
+  const user = data.users.find((u) => u.phone === phoneNumber);
+  if (!user) {
+    throw new Error("User not found with this phone number");
+  }
+
+  return { success: true, user };
+};
+
+export const fetchUsersDirect = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users`);
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to fetch users");
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error("Failed to fetch users: " + error.message);
+  }
+};
+
+export const getUserByIdDirect = async (userId) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/${userId}`);
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error("Failed to fetch user");
+  }
+
+  return data.user;
+};
+
+export const createTestAttemptDirect = async (testId, userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/test-attempts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        test_id: testId,
+        user_id: userId,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to create test attempt");
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error("Failed to create test attempt: " + error.message);
+  }
+};
+
+export const fetchTestsDirect = async (page = 1, limit = 10) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/tests?page=${page}&limit=${limit}`
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching tests:", error);
+    throw new Error("Failed to fetch tests");
+  }
+};
+
+export const submitTestAttemptAnswerDirect = async (answerData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/test-attempt-answers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(answerData),
+    });
+
+    const data = await response.json();
+    console.log("Submit answer response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to submit answer");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error submitting answer:", error);
+    throw new Error("Failed to submit answer: " + error.message);
+  }
+};
+
+export const updateTestAttemptAnswerDirect = async (answerData) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/test-attempt-answers/${answerData.test_attempt_id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(answerData),
+      }
+    );
+
+    const data = await response.json();
+    console.log("Update answer response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update answer");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error updating answer:", error);
+    throw new Error("Failed to update answer: " + error.message);
+  }
+};
+
+// New createTestAttempt function
+export const createTestAttempt = async (testId, userId) => {
+  console.log("API: Creating test attempt:", { testId, userId });
+  try {
+    const response = await postData("test-attempts", {
+      test_id: testId,
+      user_id: userId,
+    });
+    console.log("API: Test attempt created:", response);
+    return response;
+  } catch (error) {
+    console.error("API: Error creating test attempt:", error);
+    console.error("API: Error details:", {
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    throw error;
+  }
+};
+
+export const fetchUsers = async () => {
+  console.log("API: Fetching users");
+  try {
+    const response = await fetchData("users");
+    console.log("API: Users fetched successfully:", response);
+    return response;
+  } catch (error) {
+    console.error("API: Error fetching users:", error);
+    throw error;
+  }
+};

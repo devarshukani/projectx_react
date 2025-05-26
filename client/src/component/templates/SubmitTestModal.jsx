@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const SubmitTestModal = ({ answered, marked, unanswered, onClose }) => {
+const SubmitTestModal = ({ answered, marked, unanswered, onClose, onSubmit }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="fixed bg-[#d2d2d2] opacity-50 inset-0 backdrop-blur-sm"></div>
@@ -32,12 +32,12 @@ const SubmitTestModal = ({ answered, marked, unanswered, onClose }) => {
           >
             Back
           </button>
-          <Link
-            to="/test/result"
+          <button
+            onClick={onSubmit}
             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
             Submit
-          </Link>
+          </button>
         </div>
       </div>
     </div>

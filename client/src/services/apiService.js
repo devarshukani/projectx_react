@@ -93,3 +93,43 @@ export const fetchTests = async (page = 1, limit = 10) => {
     throw new Error("Failed to fetch tests");
   }
 };
+
+export const submitTestAttemptAnswer = async (answerData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/test-attempt-answers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(answerData),
+    });
+
+    const data = await response.json();
+    console.log("Submit answer response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to submit answer");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error submitting answer:", error);
+    throw new Error("Failed to submit answer: " + error.message);
+  }
+};
+
+export const updateTestAttemptAnswer = async (answerData) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/test-attempt-answers/${answerData.test_attempt_id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(answerData),
+      }
+    );
+
+    const data = await response.json();
+    console.log("Update answer response:", data);

@@ -7,7 +7,7 @@ import {
   setLoading,
   setError,
 } from "../redux/slices/authSlice";
-import { sendOtp } from "../services/apiService";
+import { sendOtp } from "../services/apiService.jsx";
 
 const countryList = [
   { code: "+91", country: "India" },

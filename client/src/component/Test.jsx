@@ -5,7 +5,7 @@ import Header from "./templates/Header";
 import Trending from "./templates/Trending";
 import TestSeries from "./templates/TestSeries";
 import Search from "./templates/Search";
-import { fetchTests } from "../services/apiService";
+import { fetchTests } from "../services/apiService.jsx";
 
 const Test = () => {
   const [tests, setTests] = useState([]);

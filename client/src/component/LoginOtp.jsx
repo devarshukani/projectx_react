@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess, setError, setLoading } from "../redux/slices/authSlice";
-import { verifyOtp } from "../services/apiService";
+import { verifyOtp } from "../services/apiService.jsx";
 
 const LoginOtp = () => {
   const [otp, setOtp] = useState("");

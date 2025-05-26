@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { createTestAttempt } from "../../services/apiService";
+import { createTestAttempt } from "../../services/apiService.jsx";
 
 const StartTestPopup = ({ isOpen, onClose, testData }) => {
   const [allowChangeAnswer, setAllowChangeAnswer] = useState(true);
@@ -20,15 +20,21 @@ const StartTestPopup = ({ isOpen, onClose, testData }) => {
       const response = await createTestAttempt(testData.id, user.id);
       console.log("Test attempt created successfully:", response);
 
-      // If successful, navigate to test screen
-      navigate("/test/testscreen", {
-        state: {
-          testId: testData.id,
-          allowChangeAnswer,
-          testData,
-        },
-      });
-      onClose();
+      if (response.success && response.data) {
+        // Navigate to test screen with attempt ID and other data
+        navigate("/test/testscreen", {
+          state: {
+            testId: testData.id,
+            attemptId: response.data.id, // Pass the attempt ID
+            allowChangeAnswer,
+            testData,
+          },
+        });
+        onClose();
+      } else {
+        console.error("Failed to create test attempt: No data in response");
+        // You might want to show an error message to the user here
+      }
     } catch (error) {
       console.error("Error creating test attempt:", error);
       // You might want to show an error message to the user here
