@@ -475,3 +475,10 @@ export const fetchUsers = async () => {
     throw error;
   }
 };
+
+// Test attempt score services
+export const getTestAttemptScores = async (attemptId) => {
+  const response = fetchData(`test-attempts/${attemptId}/scores`);
+  console.log("API: Test attempt scores fetched:", response);
+  return response;
+};
