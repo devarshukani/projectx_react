@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import Header from "./templates/Header";
 import SideNav from "./templates/SideNav";
-import Subject from "./templates/Subject";
 import SolutionTopic from "./templates/SolutionTopic";
 import ClaimPanel from "./templates/ClaimPanel";
 import { useParams } from "react-router-dom";
@@ -21,100 +20,123 @@ const Solutions = () => {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const solutionContainerRef = useRef(null);
-  const {testId, attemptId} = useParams();
+  const { testId, attemptId } = useParams();
 
-  const topic = [
-    "Medicine",
-    "Surgery",
-    "Paediatrics",
-    "Orthopaedics",
-    "ENT",
-    "Ophthalmology",
-    "Radiology",
-    "Anesthesia",
-    "Paediatrics",
-    "Psychiatry",
-    "Dermatology",
-    "Physiology",
-    "Pathology",
-    "Pharmacology",
-    "Biochemistry",
-    "Psychiatry",
-    "Dermatology",
-    "Physiology",
-    "Pathology",
-    "Pharmalogy",
-  ];
+  // State for API data
+  const [testData, setTestData] = useState(null);
+  const [attemptData, setAttemptData] = useState(null);
+  const [transformedQuestions, setTransformedQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [subjects, setSubjects] = useState([]);
+  const [topics, setTopics] = useState([]);
 
-  // Add sample question data
-  const questionData = [
-    {
-      question_no: 1,
-      total_time_taken: "24 sec",
-      topic_name: "Neurology",
-      question_text:
-        "A 5-year-old male is brought to ER of Seti Provincial Hospital with brief lapses of consciousness and fall few hours back. There was no injury in the body of the patient and without any complaints now. Which of the following does not hold true in such case?",
-      options: ["Migraine", "Trigeminal neuralgia", "Epilepsy", "Syncope"],
-      answered_option: "Migraine",
-      correct_option: "Trigeminal neuralgia",
-    },
-    {
-      question_no: 2,
-      total_time_taken: "24 sec",
-      topic_name: "Neurology",
-      question_text:
-        "A 5-year-old male is brought to ER of Seti Provincial Hospital with brief lapses of consciousness and fall few hours back. There was no injury in the body of the patient and without any complaints now. Which of the following does not hold true in such case?",
-      options: ["Migraine", "Trigeminal neuralgia", "Epilepsy", "Syncope"],
-      answered_option: "Epilepsy",
-      correct_option: "Trigeminal neuralgia",
-    },
-    {
-      question_no: 3,
-      total_time_taken: "24 sec",
-      topic_name: "Neurology",
-      question_text:
-        "A 5-year-old male is brought to ER of Seti Provincial Hospital with brief lapses of consciousness and fall few hours back. There was no injury in the body of the patient and without any complaints now. Which of the following does not hold true in such case?",
-      options: ["Migraine", "Trigeminal neuralgia", "Epilepsy", "Syncope"],
-      answered_option: "Trigeminal neuralgia",
-      correct_option: "Trigeminal neuralgia",
-    },
-    {
-      question_no: 4,
-      total_time_taken: "24 sec",
-      topic_name: "Neurology",
-      question_text:
-        "A 5-year-old male is brought to ER of Seti Provincial Hospital with brief lapses of consciousness and fall few hours back. There was no injury in the body of the patient and without any complaints now. Which of the following does not hold true in such case?",
-      options: ["Migraine", "Trigeminal neuralgia", "Epilepsy", "Syncope"],
-      answered_option: "",
-      correct_option: "Trigeminal neuralgia",
-    },
-  ];
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch test data
+        const testResponse = await fetch(`http://13.203.220.236/api/tests/${testId}`);
+        const testJson = await testResponse.json();
+        setTestData(testJson.data);
+        
+        // Fetch attempt data
+        const attemptResponse = await fetch(`http://13.203.220.236/api/test-attempt-answers/${attemptId}`);
+        const attemptJson = await attemptResponse.json();
+        setAttemptData(attemptJson.data);
+        
+        // Transform data
+        const transformed = transformData(testJson.data, attemptJson.data);
+        setTransformedQuestions(transformed);
+        
+        // Extract unique subjects and topics
+        const uniqueSubjects = [...new Set(transformed.map(q => q.subject.id))]
+          .map(id => {
+            const subject = transformed.find(q => q.subject.id === id).subject;
+            return { id: subject.id, name: subject.name };
+          });
+        
+        const uniqueTopics = [...new Set(transformed.map(q => q.topic.id))]
+          .map(id => {
+            const topic = transformed.find(q => q.topic.id === id).topic;
+            return { id: topic.id, name: topic.name };
+          });
+        
+        setSubjects(uniqueSubjects);
+        setTopics(uniqueTopics);
+        
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [testId, attemptId]);
 
-  // Filter categories
-  const filterCategories = {
-    topics: [],
-    bookmarks: ["All", "Bookmarked"],
-    answers: ["All", "Correct", "Incorrect", "Attempted", "Unattempted"],
+  // Transform API data to match our format
+  const transformData = (testData, attemptData) => {
+    return testData.questions.map(question => {
+      const attempt = attemptData.find(a => a.question_id === question.id) || {};
+      
+      return {
+        question_no: question.id,
+        total_time_taken: `${attempt.time_taken || 0} sec`,
+        topic_name: question.topicData?.name || 'Unknown',
+        subject_name: question.subjectData?.name || 'Unknown',
+        question_text: question.question,
+        options: question.options.map(option => ({
+          id: option.id,
+          name: option.name,
+          is_answer: option.is_answer
+        })),
+        answered_option: attempt.selected_option || null,
+        correct_option: question.options.find(opt => opt.is_answer)?.id || null,
+        explanation: question.explanation,
+        exp_image: question.exp_image,
+        difficulty: question.difficulty_level,
+        subject: question.subjectData || { id: question.subject, name: 'Unknown' },
+        topic: question.topicData || { id: question.topic, name: 'Unknown' },
+        microTopics: question.microTopicsData,
+        isAttempted: !!attempt.selected_option,
+        isCorrect: attempt.is_correct,
+        isIncorrect: attempt.is_incorrect,
+        isSkipped: attempt.is_skipped,
+        selectedOption: attempt.selected_option,
+        timeTaken: attempt.time_taken,
+        correctMarks: parseFloat(testData.correct_marks),
+        incorrectMarks: parseFloat(testData.incorrect_marks)
+      };
+    });
   };
 
   // Filter questions based on selected filter
-  const filteredQuestions = questionData.filter((question) => {
+  const filteredQuestions = transformedQuestions.filter((question) => {
     switch (activeFilter.toLowerCase()) {
       case "correct":
-        return question.answered_option === question.correct_option;
+        return question.isCorrect;
       case "incorrect":
-        return (
-          question.answered_option !== "" &&
-          question.answered_option !== question.correct_option
-        );
+        return question.isIncorrect;
       case "attempted":
-        return question.answered_option !== "";
+        return question.isAttempted;
       case "unattempted":
-        return question.answered_option === "";
+        return !question.isAttempted || question.isSkipped;
       default:
         return true;
     }
   });
+
+  // Filter by active topic if set
+  const topicFilteredQuestions = activeTopic 
+    ? filteredQuestions.filter(q => q.topic.id === activeTopic)
+    : filteredQuestions;
+
+  // Filter questions to show only expanded question when one is selected
+  const questionsToShow = expandedQuestionId
+    ? topicFilteredQuestions.filter((q) => q.question_no === expandedQuestionId)
+    : topicFilteredQuestions;
 
   // Handle section expansion
   const handleSectionClick = (section) => {
@@ -122,11 +144,8 @@ const Solutions = () => {
   };
 
   // Function to handle topic click
-  const handleTopicClick = (ref, topic) => {
-    setActiveTopic(topic); // Set the active topic
-    if (ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
-    }
+  const handleTopicClick = (topicId) => {
+    setActiveTopic(activeTopic === topicId ? null : topicId);
   };
 
   // Function to handle solution view click
@@ -136,11 +155,14 @@ const Solutions = () => {
     );
   };
 
-  // Filter questions to show only expanded question when one is selected
-  const questionsToShow = expandedQuestionId
-    ? filteredQuestions.filter((q) => q.question_no === expandedQuestionId)
-    : filteredQuestions;
+  // Filter categories
+  const filterCategories = {
+    topics: [],
+    bookmarks: ["All", "Bookmarked"],
+    answers: ["All", "Correct", "Incorrect", "Attempted", "Unattempted"],
+  };
 
+  // Canvas drawing functions
   useEffect(() => {
     if (expandedQuestionId && drawingEnabled) {
       const canvas = canvasRef.current;
@@ -212,6 +234,38 @@ const Solutions = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <>
+        <SideNav />
+        <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#ededed]">
+          <div className="w-full mt-20">
+            <Header title={"Solution"} />
+            <div className="flex justify-center items-center h-64">
+              <div className="text-xl">Loading test data...</div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!testData || !attemptData) {
+    return (
+      <>
+        <SideNav />
+        <div className="w-full h-full overflow-auto overflow-x-hidden bg-[#ededed]">
+          <div className="w-full mt-20">
+            <Header title={"Solution"} />
+            <div className="flex justify-center items-center h-64">
+              <div className="text-xl text-red-500">Error loading test data</div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <SideNav />
@@ -236,13 +290,13 @@ const Solutions = () => {
                 </div>
                 {expandedSection === "topics" && (
                   <div className="py-4 w-full grid grid-cols-1 gap-4">
-                    {topic.map((id) => (
+                    {topics.map((topic) => (
                       <SolutionTopic
-                        key={id}
-                        name={id}
-                        count={90}
-                        isActive={activeTopic === id}
-                        onClick={() => setActiveTopic(id)}
+                        key={topic.id}
+                        name={topic.name}
+                        count={transformedQuestions.filter(q => q.topic.id === topic.id).length}
+                        isActive={activeTopic === topic.id}
+                        onClick={() => handleTopicClick(topic.id)}
                       />
                     ))}
                   </div>
@@ -333,7 +387,7 @@ const Solutions = () => {
                         <div className="text-zinc-800 text-sm font-semibold">
                           Question {question.question_no}
                         </div>
-                        {question.answered_option === "" && (
+                        {!question.isAttempted && (
                           <div className="w-28 h-3 justify-start text-orange-400 text-xs font-semibold font-['Open_Sans']">
                             You didn't attempt
                           </div>
@@ -341,19 +395,18 @@ const Solutions = () => {
                       </div>
                       <div
                         className={`text-xs font-semibold ${
-                          question.answered_option === ""
+                          !question.isAttempted
                             ? "text-orange-400"
-                            : question.answered_option ===
-                              question.correct_option
+                            : question.isCorrect
                             ? "text-emerald-500"
                             : "text-red-500"
                         }`}
                       >
-                        {question.answered_option === ""
+                        {!question.isAttempted
                           ? "0 Marks"
-                          : question.answered_option === question.correct_option
-                          ? "+1 Marks"
-                          : "-0.25 Marks"}
+                          : question.isCorrect
+                          ? `+${question.correctMarks} Marks`
+                          : `${question.incorrectMarks} Marks`}
                       </div>
                     </div>
 
@@ -370,6 +423,9 @@ const Solutions = () => {
                       <div className="px-4 py-2 bg-white rounded-md border border-blue-900">
                         {question.topic_name}
                       </div>
+                      <div className="px-4 py-2 bg-white rounded-md border border-blue-900">
+                        Difficulty: {question.difficulty}/5
+                      </div>
                     </div>
 
                     {/* Options Grid */}
@@ -379,31 +435,35 @@ const Solutions = () => {
                           key={index}
                           className={`px-4 py-6 rounded-xl shadow-[4.5px_4.5px_20.3px_0px_rgba(137,137,137,0.09)] inline-flex justify-between items-center
                             ${
-                              question.answered_option === ""
-                                ? "bg-gray-200 text-zinc-800"
-                                : option === question.correct_option
+                              !question.isAttempted
+                                ? option.is_answer
+                                  ? "bg-emerald-100 text-zinc-800"
+                                  : "bg-gray-200 text-zinc-800"
+                                : option.id === question.correct_option
                                 ? "bg-emerald-500 text-stone-50"
-                                : option === question.answered_option
+                                : option.id === question.selectedOption
                                 ? "bg-red-500 text-stone-50"
+                                : option.is_answer
+                                ? "bg-emerald-100 text-zinc-800"
                                 : "bg-gray-200 text-zinc-800"
                             }`}
                         >
                           <div className="font-['Open_Sans'] font-semibold">
-                            {option}
+                            {option.name}
                           </div>
-                          {question.answered_option !== "" &&
-                            (option === question.correct_option ||
-                              option === question.answered_option) && (
+                          {question.isAttempted &&
+                            (option.id === question.correct_option ||
+                              option.id === question.selectedOption) && (
                               <div className="w-5 h-5 relative">
                                 <div
                                   className="w-3 absolute outline-[1.50px] outline-offset-[-0.75px] outline-stone-50"
                                   style={{
                                     height:
-                                      option === question.correct_option
+                                      option.id === question.correct_option
                                         ? "10px"
                                         : "12px",
                                     top:
-                                      option === question.correct_option
+                                      option.id === question.correct_option
                                         ? "5.69px"
                                         : "4.38px",
                                     left: "4.38px",
@@ -420,10 +480,9 @@ const Solutions = () => {
                       <div className="flex items-center gap-3">
                         <i
                           className={`ri-lightbulb-line ${
-                            question.answered_option === ""
+                            !question.isAttempted
                               ? "text-orange-400"
-                              : question.answered_option ===
-                                question.correct_option
+                              : question.isCorrect
                               ? "text-emerald-500"
                               : "text-red-500"
                           }`}
@@ -532,58 +591,48 @@ const Solutions = () => {
                               <span className="font-semibold">
                                 Correct Answer:{" "}
                               </span>
-                              <span>{question.correct_option}</span>
+                              <span>{question.options.find(opt => opt.is_answer)?.name}</span>
                             </div>
 
                             {/* Solution explanation */}
                             <div className="mb-6">
                               <h4 className="font-semibold mb-2">Explanation:</h4>
                               <p className="text-gray-700">
-                                Trigeminal neuralgia is characterized by episodes
-                                of severe facial pain that last from a few seconds
-                                to several minutes. It typically affects one side
-                                of the face and is often triggered by normal daily
-                                activities. This condition is not typically
-                                associated with loss of consciousness or falls,
-                                making it the incorrect choice in this scenario.
+                                {question.explanation || "No explanation provided."}
                               </p>
                             </div>
 
-                            {/* Key Points */}
-                            <div className="mb-6">
-                              <h4 className="font-semibold mb-2">Key Points:</h4>
-                              <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                                <li>
-                                  Epilepsy can cause brief lapses of consciousness
-                                </li>
-                                <li>
-                                  Syncope is characterized by temporary loss of
-                                  consciousness
-                                </li>
-                                <li>
-                                  Migraine can be associated with aura and
-                                  occasional loss of consciousness
-                                </li>
-                                <li>
-                                  Trigeminal neuralgia does not typically cause
-                                  loss of consciousness
-                                </li>
-                              </ul>
-                            </div>
-
-                            {/* Reference Image if available */}
-                            {question.solution_image && (
+                            {/* Explanation Images if available */}
+                            {question.exp_image?.length > 0 && (
                               <div className="mb-6">
-                                <h4 className="font-semibold mb-2">
-                                  Reference Image:
-                                </h4>
-                                <img
-                                  src={question.solution_image}
-                                  alt="Solution reference"
-                                  className="max-w-full rounded-lg shadow-md"
-                                />
+                                <h4 className="font-semibold mb-2">Explanation Images:</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {question.exp_image.map((img, i) => (
+                                    <img
+                                      key={i}
+                                      src={img}
+                                      alt={`Explanation ${i + 1}`}
+                                      className="max-w-full rounded-lg shadow-md"
+                                    />
+                                  ))}
+                                </div>
                               </div>
                             )}
+
+                            {/* Micro Topics */}
+                            <div className="mb-6">
+                              <h4 className="font-semibold mb-2">Related Topics:</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {question.microTopics?.map(topic => (
+                                  <span 
+                                    key={topic.id} 
+                                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                                  >
+                                    {topic.name || `Micro Topic ${topic.id}`}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
                           </div>
 
                           {/* Additional Resources */}

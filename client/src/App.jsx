@@ -15,6 +15,7 @@ import LoginOtp from "./component/LoginOtp";
 import PrivateRoute from "./component/templates/PrivateRoute";
 import JobDetails from "./component/JobDetails";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import TestAnalysisDashboard from "./component/temp";
 
 function App() {
   return (
@@ -108,6 +109,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          {/* <Route path="check" element={<TestAnalysisDashboard testId={7} attemptId={42} />} /> */}
         </Routes>
       </div>
     </GoogleOAuthProvider>
