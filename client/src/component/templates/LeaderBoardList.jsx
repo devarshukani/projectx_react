@@ -1,6 +1,6 @@
 import React from "react";
 
-const LeaderBoardList = () => {
+const LeaderBoardList = ({ users }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 overflow-y-auto overflow-x-hidden">
       <div className="fixed bg-[#d2d2d2] opacity-50 inset-0 backdrop-blur-sm"></div>
@@ -91,27 +91,38 @@ const LeaderBoardList = () => {
 
           {/* List of other participants */}
           <div className="space-y-3">
-            {[...Array(10)].map((_, index) => (
-              <div
-                key={`leaderboard-rank-${index + 4}`}
-                className="flex items-center justify-between px-5 py-3 hover:bg-gray-100 rounded-lg"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-zinc-300 rounded-full"></div>
-                  <span className="text-lg font-medium text-zinc-800">
-                    Aman
-                  </span>
+            {(users || []).map((user, i) => {
+              const rank = i + 4; // Start from 4th rank after top 3
+              return (
+                <div
+                  key={user.id || `rank-${rank}`}
+                  className="flex items-center justify-between px-5 py-3 hover:bg-gray-100 rounded-lg"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-zinc-300 rounded-full">
+                      {user.avatar && (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name} 
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <span className="text-lg font-medium text-zinc-800">
+                      {user.name || `Participant ${rank}`}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-8">
+                    <span className="text-lg font-medium text-zinc-800">
+                      {rank}th
+                    </span>
+                    <span className="text-lg font-medium text-zinc-800">
+                      {user.score || '0'}/{user.total || '60'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-8">
-                  <span className="text-lg font-medium text-zinc-800">{`${
-                    index + 4
-                  }th`}</span>
-                  <span className="text-lg font-medium text-zinc-800">
-                    58/60
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Pagination */}

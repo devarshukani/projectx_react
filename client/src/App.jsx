@@ -59,7 +59,7 @@ function App() {
           }
         />
         <Route
-          path="/test/result"
+          path="/test/result/:testId/:attemptId"
           element={
             <PrivateRoute>
               <TestResult />
@@ -83,9 +83,11 @@ function App() {
           }
         />
         <Route
-          path="/test/solution"
+          path="/test/solution/:testId/:attemptId"
           element={
+            <PrivateRoute>
               <Solutions />
+            </PrivateRoute>
           }
         />
         <Route

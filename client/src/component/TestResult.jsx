@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import SideNav from "./templates/SideNav";
 import Header from "./templates/Header";
 import TestResultHorizontalCard from "./templates/TestResultHorizontalCard";
@@ -17,7 +17,7 @@ const TestResult = () => {
   const [testScores, setTestScores] = useState(null);
   const [testDetails, setTestDetails] = useState(null);
   const location = useLocation();
-  const { testId, attemptId } = location.state || {};
+  const { testId, attemptId } = useParams();
 
   useEffect(() => {
     const fetchResults = async () => {

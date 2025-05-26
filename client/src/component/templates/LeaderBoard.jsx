@@ -4,7 +4,7 @@ import second_medal from "/second_medal.svg";
 import third_medal from "/third_medal.svg";
 import LeaderBoardList from "./LeaderBoardList";
 
-const LeaderBoard = () => {
+const LeaderBoard = ({ currentRank, topUsers }) => {
   const [showLeaderBoard, setShowLeaderBoard] = useState(false);
   const podiumRef = useRef(null);
 
@@ -95,7 +95,7 @@ const LeaderBoard = () => {
         </div>
       </div>
 
-      {showLeaderBoard && <LeaderBoardList />}
+      {showLeaderBoard && <LeaderBoardList users={topUsers} />}
     </div>
   );
 };

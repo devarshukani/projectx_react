@@ -323,7 +323,7 @@ const TestScreen = () => {
       setShowSubmitModal(false);
 
       // Navigate to results
-      navigate("/test/result", {
+      navigate(`/test/result/${testId}/${attemptId}`, {
         state: {
           testId,
           attemptId,

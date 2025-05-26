@@ -33,14 +33,26 @@ const Login = () => {
       try {
         // Fetch users and find matching phone number
         const response = await fetchUsers();
+        const fullPhoneNumber = `${selectedCountry.code}${localPhoneNumber}`;
+        
+        console.log('Searching for phone number:', localPhoneNumber);
+        console.log('Available users:', response.users);
+        
         const user = response.users.find((u) => u.phone === localPhoneNumber);
 
         if (!user) {
           throw new Error("No user found with this phone number");
         }
 
-        // Store user data in Redux and navigate to home
-        dispatch(loginSuccess(user));
+        // Add isAuthenticated flag and phone number before storing in redux
+        const userData = {
+          ...user,
+          phoneNumber: localPhoneNumber,
+          isAuthenticated: true,
+        };
+
+        // Store user data in Redux and localStorage
+        dispatch(loginSuccess(userData));
         navigate("/");
       } catch (err) {
         dispatch(setError(err.message || "Failed to process request"));
