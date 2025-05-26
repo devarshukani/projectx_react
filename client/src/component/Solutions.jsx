@@ -4,6 +4,7 @@ import SideNav from "./templates/SideNav";
 import Subject from "./templates/Subject";
 import SolutionTopic from "./templates/SolutionTopic";
 import ClaimPanel from "./templates/ClaimPanel";
+import { useParams } from "react-router-dom";
 
 const Solutions = () => {
   const [expandedSection, setExpandedSection] = useState(""); // topics, bookmarks, answers
@@ -20,6 +21,7 @@ const Solutions = () => {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const solutionContainerRef = useRef(null);
+  const {testId, attemptId} = useParams();
 
   const topic = [
     "Medicine",

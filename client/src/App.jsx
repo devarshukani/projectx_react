@@ -14,100 +14,103 @@ import SignUpOtp from "./component/SignUpOtp";
 import LoginOtp from "./component/LoginOtp";
 import PrivateRoute from "./component/templates/PrivateRoute";
 import JobDetails from "./component/JobDetails";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function App() {
   return (
-    <div className="bg-[#f7f7f7] w-screen h-screen flex">
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/login-otp" element={<LoginOtp />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signup-otp" element={<SignUpOtp />} />
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <div className="bg-[#f7f7f7] w-screen h-screen flex">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/login-otp" element={<LoginOtp />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signup-otp" element={<SignUpOtp />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/test"
-          element={
-            <PrivateRoute>
-              <Test />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/testinfo"
-          element={
-            <PrivateRoute>
-              <TestDetails />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/test/testscreen"
-          element={
-            <PrivateRoute>
-              <TestScreen />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/test/result/:testId/:attemptId"
-          element={
-            <PrivateRoute>
-              <TestResult />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/video"
-          element={
-            <PrivateRoute>
-              <Video />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/video/details"
-          element={
-            <PrivateRoute>
-              <VideoDetails />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/test/solution/:testId/:attemptId"
-          element={
-            <PrivateRoute>
-              <Solutions />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/bookmark"
-          element={
-            <PrivateRoute>
-              <Bookmark />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/jobs/:jobId"
-          element={
-            <PrivateRoute>
-              <JobDetails />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
-    </div>
+          {/* Protected Routes */}
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/test"
+            element={
+              <PrivateRoute>
+                <Test />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/testinfo"
+            element={
+              <PrivateRoute>
+                <TestDetails />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/test/testscreen"
+            element={
+              <PrivateRoute>
+                <TestScreen />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/test/result/:testId/:attemptId"
+            element={
+              <PrivateRoute>
+                <TestResult />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/video"
+            element={
+              <PrivateRoute>
+                <Video />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/video/details"
+            element={
+              <PrivateRoute>
+                <VideoDetails />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/test/solution/:testId/:attemptId"
+            element={
+              <PrivateRoute>
+                <Solutions />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/bookmark"
+            element={
+              <PrivateRoute>
+                <Bookmark />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/jobs/:jobId"
+            element={
+              <PrivateRoute>
+                <JobDetails />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </div>
+    </GoogleOAuthProvider>
   );
 }
 
